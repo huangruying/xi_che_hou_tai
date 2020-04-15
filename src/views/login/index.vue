@@ -30,7 +30,7 @@
           ref="password"
           v-model="loginForm.password"
           :type="passwordType"
-          placeholder="Password"
+          placeholder="请输入密码"
           name="password"
           tabindex="2"
           auto-complete="on"
@@ -41,11 +41,11 @@
         </span>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
 
       <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
+        <span style="margin-right:20px;">用户名: admin</span>
+        <span> 密码: 123456</span>
       </div>
 
     </el-form>
@@ -54,20 +54,20 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
-
+// import { login } from '@/api/user'
 export default {
   name: 'Login',
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
+        callback(new Error('请输入正确用户名'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+        callback(new Error('密码不能低于6位'))
       } else {
         callback()
       }
@@ -75,7 +75,7 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: '111111'
+        password: '123456'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -109,12 +109,33 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
+          this.$store.dispatch('user/login', {
+            username: this.loginForm.username,
+            password: this.loginForm.password
+          }).then(() => {
             this.$router.push({ path: this.redirect || '/' })
             this.loading = false
           }).catch(() => {
             this.loading = false
           })
+          // login({
+          //   username: this.loginForm.username,
+          //   password: this.loginForm.password
+          // }).then(res => {
+          //   if (res.code === '200') {
+          //     console.log(res)
+          //     this.$message({
+          //       showClose: true,
+          //       message: res.msg,
+          //       type: 'success'
+          //     })
+          //     this.$store.dispatch('Acount', res.data)
+          //     console.log(this.$store.state.user)
+          //     this.$router.push({ path: this.redirect || '/' })
+          //   } else {
+          //     this.$message.error(res.data.msg)
+          //   }
+          // })
         } else {
           console.log('error submit!!')
           return false
@@ -131,7 +152,7 @@ export default {
 
 $bg:#283443;
 $light_gray:#fff;
-$cursor: #fff;
+$cursor: #fff;    
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
   .login-container .el-input input {
@@ -221,7 +242,7 @@ $light_gray:#eee;
       margin: 0px auto 40px auto;
       text-align: center;
       font-weight: bold;
-      letter-spacing:2px
+      letter-spacing:30px
     }
   }
 

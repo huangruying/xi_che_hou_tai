@@ -24,7 +24,7 @@ import Layout from '@/layout'
     activeMenu: '/example/list'  if set path, the sidebar will highlight the path you set
   }
  */
-
+// icon example table
 /**
  * constantRoutes
  * a base page that does not have permission requirements
@@ -46,49 +46,51 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
-    children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
-    }]
-  },
-
-  {
-    path: '/example',
-    component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'Example', icon: 'example' },
+    redirect: 'annual',
+    meta: { title: '订单管理', icon: 'dashboard' },
     children: [
       {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
+        path: 'annual',
+        name: 'annual',
+        component: () => import('@/views/annual/index'),
+        meta: { title: '年检订单', icon: 'dashboard' }
       },
       {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
+        path: 'serve',
+        name: 'serve',
+        component: () => import('@/views/serve/index'),
+        meta: { title: '服务订单', icon: 'table' }
       }
     ]
   },
 
   {
-    path: '/form',
+    path: '/nodeList',
+    alwaysShow: true,
     component: Layout,
+    meta: { title: '网点管理', icon: 'example' },
     children: [
       {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
+        path: 'nodeList',
+        name: 'nodeList',
+        component: () => import('@/views/nodeList/index'),
+        meta: { title: '网点列表', icon: 'table' }
       }
     ]
   },
+
+  // {
+  //   path: '/form',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       name: 'Form',
+  //       component: () => import('@/views/form/index'),
+  //       meta: { title: 'Form', icon: 'form' }
+  //     }
+  //   ]
+  // },
 
   {
     path: '/nested',
@@ -144,17 +146,6 @@ export const constantRoutes = [
         path: 'menu2',
         component: () => import('@/views/nested/menu2/index'),
         meta: { title: 'menu2' }
-      }
-    ]
-  },
-
-  {
-    path: 'external-link',
-    component: Layout,
-    children: [
-      {
-        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: 'External Link', icon: 'link' }
       }
     ]
   },
