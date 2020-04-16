@@ -46,7 +46,21 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: 'annual',
+    redirect: 'dashboard',
+    children: [
+      {
+        path: 'dashboard',
+        name: 'dashboard',
+        component: () => import('@/views/dashboard/index')
+        // meta: { title: '', icon: '' }
+      }
+    ]
+  },
+
+  {
+    path: '',
+    component: Layout,
+    // redirect: 'annual',
     meta: { title: '订单管理', icon: 'dashboard' },
     children: [
       {
@@ -75,6 +89,32 @@ export const constantRoutes = [
         name: 'nodeList',
         component: () => import('@/views/nodeList/index'),
         meta: { title: '网点列表', icon: 'table' }
+      }
+    ]
+  },
+
+  {
+    path: '/account',
+    component: Layout,
+    meta: { title: '账号管理', icon: 'example' },
+    children: [
+      // {
+      //   path: 'nodeList',
+      //   name: 'nodeList',
+      //   component: () => import('@/views/nodeList/index'),
+      //   meta: { title: '技师账号管理', icon: 'table' }
+      // },
+      {
+        path: 'account',
+        name: 'account',
+        component: () => import('@/views/account/index'),
+        meta: { title: '网点账号管理', icon: 'table' }
+      },
+      {
+        path: 'carOwner',
+        name: 'carOwner',
+        component: () => import('@/views/carOwner/index'),
+        meta: { title: '车主账号管理', icon: 'table' }
       }
     ]
   },

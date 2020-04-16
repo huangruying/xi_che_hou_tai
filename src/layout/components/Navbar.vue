@@ -36,7 +36,7 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
-
+import { logout } from '@/api/user'
 export default {
   components: {
     Breadcrumb,
@@ -53,8 +53,22 @@ export default {
       this.$store.dispatch('app/toggleSideBar')
     },
     async logout() {
-      this.$router.push({ path: '/login' })
-      await this.$store.dispatch('user/logout')
+      await logout({ username: this.$store.state.user.name }).then(res => {
+        // eslint-disable-next-line eqeqeq
+        if (res.code == 200) {
+          this.$store.commit('user/RESET_STATE')
+          this.$router.push({ path: '/login' })
+          this.$message({
+            showClose: true,
+            // eslint-disable-next-line no-undef
+            message: res.msg,
+            type: 'success'
+          })
+        } else {
+          this.$message.error(res.data.msg)
+        }
+      })
+      // await this.$store.dispatch('user/logout')
       // this.$router.push(`/login?redirect=${this.$route.fullPath}`)
     }
   }

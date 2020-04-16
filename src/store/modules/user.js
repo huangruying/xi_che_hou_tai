@@ -1,7 +1,9 @@
 import { login, logout, getInfo } from '@/api/user'
 // import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
-
+import Vue from 'vue';
+import { Message } from 'element-ui';
+Vue.component( Message);
 const getDefaultState = () => {
   return {
     // token: getToken(),
@@ -27,7 +29,6 @@ const mutations = {
     state.data = data
     state.name = data.username
     state.avatar = data.pic
-    console.log(state.name)
   },
   SET_NAME: (state, name) => {
     state.name = name
@@ -59,13 +60,10 @@ const actions = {
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
         const { data } = response
-
         if (!data) {
           reject('Verification failed, please Login again.')
         }
-
         const { name, avatar } = data
-
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
         resolve(data)

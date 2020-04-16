@@ -111,8 +111,13 @@ export default {
           this.loading = true
           this.$store.dispatch('user/login', {
             username: this.loginForm.username,
-            password: this.loginForm.password
+            password: this.loginForm.password,
           }).then(() => {
+            this.$message({
+                showClose: true,
+                message: "登录成功！",
+                type: 'success'
+            })
             this.$router.push({ path: this.redirect || '/' })
             this.loading = false
           }).catch(() => {

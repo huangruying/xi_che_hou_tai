@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">name: {{ }}</div>
+    <div class="dashboard-text">欢迎来到洗车后台</div>
   </div>
 </template>
 
