@@ -21,12 +21,12 @@
               :key="item.value"
             ></el-option>
           </el-select>
-          <el-select v-model="queryList.nodeTypes" @change="getData" class="input fl" placeholder="网点类型">
+          <el-select v-model="queryList.dotType" @change="getData" class="input fl" placeholder="网点类型">
             <el-option
               v-for="item in nodeTypesList"
-              :label="item.name"
-              :value="item.value"
-              :key="item.value"
+              :label="item.washType"
+              :value="item.id"
+              :key="item.id"
             ></el-option>
           </el-select>
           <el-date-picker
@@ -83,6 +83,7 @@
       :data="data.data"
       border
       stripe
+      fit
       :row-class-name="tableRowClassName"
       style="width: 100%;">
       <!-- fit highlight-current-row -->
@@ -91,11 +92,11 @@
           <span>{{ scope.row.dotCode }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="网点类型" prop="realname" align="center">
+      <el-table-column label="网点类型" prop="dotType" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.realname }}</span>
+          <span>{{ scope.row.dotType }}</span>
         </template>
-      </el-table-column> -->
+      </el-table-column>
       <el-table-column label="网点名称" prop="dotName" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.dotName }}</span>
@@ -121,19 +122,19 @@
           <span>{{ scope.row.region }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="详细地址" prop="address" align="center" width="250">
+      <!-- <el-table-column label="详细地址" prop="address" align="center" width="250">
         <template slot-scope="scope">
           <span>{{ scope.row.address }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="推荐人" prop="recommender" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.recommender }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="审核状态" prop="status" align="center">
+      <el-table-column label="审核状态" prop="statusCopy" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.status }}</span>
+          <span>{{ scope.row.statusCopy }}</span>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" prop="createTime" align="center" width="170">
@@ -185,14 +186,25 @@
       <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
        <el-divider content-position="left"><span class="title">网点信息</span></el-divider>
         <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">        
-            <el-form-item label="网点编号:" prop="dotCode" style="width:50%">
+            <!-- <el-form-item label="网点编号:" prop="dotCode" style="width:50%">
               <el-input v-model="itemObj.dotCode" style="width:210px" :disabled="alterDisabled"></el-input>
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item label="网点名称:" prop="dotName" style="width:50%">
               <el-input v-model="itemObj.dotName" style="width:210px" :disabled="inputDisabled"></el-input>
             </el-form-item>
             <el-form-item label="网点简称:" prop="dotAbbreviation" style="width:50%">
               <el-input v-model="itemObj.dotAbbreviation" style="width:210px" :disabled="inputDisabled"></el-input>
+            </el-form-item>
+            <el-form-item label="网点类型:" prop="dotType" style="width:50%">
+              <el-select v-model="itemObj.dotType" style="width:210px" placeholder="网点类型">
+                <el-option
+                  v-for="item in nodeTypesList"
+                  :label="item.washType"
+                  :value="item.washType"
+                  :key="item.id"
+                ></el-option>
+              </el-select>
+              <!-- <el-input v-model="itemObj.dotType" style="width:210px" :disabled="inputDisabled"></el-input> -->
             </el-form-item>
             <el-form-item label="客服电话:" prop="mobile" style="width:50%">
               <el-input v-model="itemObj.mobile" style="width:210px" :disabled="inputDisabled"></el-input>
@@ -252,21 +264,28 @@
               <!-- <el-input v-model="itemObj.businessHours" style="width:210px" :disabled="alterDisabled"></el-input> -->
             </el-form-item>
             <el-form-item label="省:" prop="province" style="width:50%">
-              <el-select v-model="itemObj.province" placeholder="请选择省份" @change="changeCity">
+              <!-- <el-select v-model="itemObj.province" placeholder="请选择省份" @change="changeCity">
                 <el-option v-for="(item, idx) in areaJson" :key="idx" :label="item.n" :value="item.n"></el-option>
+              </el-select> -->
+              <el-select v-model="itemObj.province" placeholder="请选择省份" @change="changeCity" :disabled="alterDisabled">
+                <el-option v-for="(item, idx) in areaJson" :key="idx" :label="item.province" :value="item.province"></el-option>
               </el-select>
-              <!-- <el-input v-model="itemObj.province" style="width:210px" :disabled="alterDisabled"></el-input> -->
             </el-form-item>
             <el-form-item label="市:" prop="city" style="width:50%">
-              <el-select v-model="itemObj.city" placeholder="请选择城市" @change="changeCounty">
-                <el-option v-for="(item, idx) in cityList" :key="idx" :label="item.n" :value="item.n"></el-option>
+              <el-select v-model="itemObj.city" placeholder="请选择城市" @change="changeCounty" :disabled="alterDisabled">
+                <el-option v-for="(item, idx) in cityList" :key="idx" :label="item.city" :value="item.cityid"></el-option>
               </el-select>
-              <!-- <el-input v-model="itemObj.city" style="width:210px" :disabled="alterDisabled"></el-input> -->
+              <!-- <el-select v-model="itemObj.city" placeholder="请选择城市" @change="changeCounty">
+                <el-option v-for="(item, idx) in cityList" :key="idx" :label="item.n" :value="item.n"></el-option>
+              </el-select> -->
             </el-form-item>
             <el-form-item label="区:" prop="region" style="width:50%">
-              <el-select v-model="itemObj.region" placeholder="请选择区/县">
-                <el-option v-for="(item, idx) in countyList" :key="idx" :label="item.n" :value="item.n"></el-option>
+              <el-select v-model="itemObj.regionId" placeholder="请选择区/县" :disabled="alterDisabled">
+                <el-option v-for="(item, idx) in countyList" :key="idx" :label="item.area" :value="item.areaid"></el-option>
               </el-select>
+              <!-- <el-select v-model="itemObj.region" placeholder="请选择区/县">
+                <el-option v-for="(item, idx) in countyList" :key="idx" :label="item.n" :value="item.n"></el-option>
+              </el-select> -->
               <!-- <el-input v-model="itemObj.region" style="width:210px" :disabled="alterDisabled"></el-input> -->
             </el-form-item>
             <el-form-item label="门店商城地址:" prop="address" style="width:100%">
@@ -402,9 +421,9 @@
 </template>
 
 <script>
-import { getList , examineDot , dotOssUpload , updateDot , saveDot , dotExport} from '@/api/nodeList'
+import { getList , examineDot , dotOssUpload , updateDot , saveDot , dotExport , findCarwashTypeInfos , findYuyueProvinces , findYuyueCityByProvinceid , findYuyueAreasByCityid} from '@/api/nodeList'
 import Pagination from "@/components/Pagination"
-import areaJson from '@/utils/city_data'
+// import areaJson from '@/utils/city_data'
 export default {
   // filters: {
   //   statusFilter(status) {
@@ -416,6 +435,7 @@ export default {
   //     return statusMap[status]
   //   }
   // },
+  name: 'nodeList',
   components: {
     Pagination
   },
@@ -446,7 +466,7 @@ export default {
       loading: false,
       passDialog: false,
       editDialog: false,
-      areaJson:areaJson,
+      areaJson: [],
       itemObj: {},
       fileList_1:[],
       fileList_2:[],
@@ -470,6 +490,9 @@ export default {
           province: [
             { required: true, message: '请选择区域', trigger: 'change' }
           ],
+          dotType: [
+            { required: true, message: '请选择网点类型', trigger: 'change' }
+          ],
           dotName: [
             { required: true, message: '不能为空', trigger: 'blur' },
             // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
@@ -478,9 +501,11 @@ export default {
              { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
           ],
           storePhone: [
+            { required: true, message: '不能为空', trigger: 'blur' },
             { validator: storePhone, trigger: 'blur' }
           ],
           chargePhone: [
+            { required: true, message: '不能为空', trigger: 'blur' },
             { validator: storePhone, trigger: 'blur' }
           ]
       },
@@ -522,31 +547,22 @@ export default {
           value: 4
         }
       ],
-      nodeTypesList: [
-        {
-          name: '网点类型',
-          value: 1
-        },
-        {
-          name: '车行',
-          value: 2
-        },
-        {
-          name: '检测站',
-          value: 3
-        },
-        {
-          name: '代办机构',
-          value: 4
-        }
-      ]
+      nodeTypesList: []
     }
   },
   created() {
     this.getData()
+    this.apiTypeInfos()
     this.thishostName = `${location.protocol}//${location.hostname}`
+    // 省市区
+    this.ApiAreaJson()
   },
   methods: {
+    apiTypeInfos(){
+      findCarwashTypeInfos().then(res=>{
+        this.nodeTypesList = res.data
+      })
+    },
     getData(filter){
       this.loading = true
       let data = {}
@@ -554,7 +570,7 @@ export default {
       if (queryList.dotCode) {
         data.dotCode = queryList.dotCode
       }
-      if (queryList.status) {
+      if (!queryList.status) {
         data.status = queryList.status
       }
       if (queryList.dotName) {
@@ -583,6 +599,10 @@ export default {
       } else {
         this.data.current_page = 1;
       }
+      if (queryList.time[0] && queryList.time[1]) {
+        data.startTime = queryList.time[0]
+        data.endTime = queryList.time[1]
+      }
       // data.username = this.$store.state.user.name
       data.pageNum = this.data.current_page
       data.pageSize = this.data.per_page
@@ -597,6 +617,15 @@ export default {
           this.data.current_page = res.pageNum
           this.data.per_page = res.pageSize
           this.data.total = res.total
+          this.data.data.forEach(v=>{
+            if(v.status == 0){
+              v.statusCopy = "待审核"
+            }else if(v.status == 1){
+              v.statusCopy = "审批通过"
+            }else if(v.status == 2){
+              v.statusCopy = "已驳回"
+            }       
+          })
         }
       })
     },
@@ -640,16 +669,16 @@ export default {
       // var arr = Object.keys(data);
       this.$refs['ruleForm'].validate((valid) => {
           if (valid) {
-            this.loadingBootm = true
+            // this.loadingBootm = true
             if(this.urlBl){
               saveDot(this.itemObj).then(res=>{
-                this.loadingBootm = false
+                // this.loadingBootm = false
+                this.editDialog = false 
                 if(res.code == 200){
                   this.$message({
                     message: '操作成功',
                     type: 'success'
                   })
-                  this.editDialog = false
                 }else{
                   this.$message({
                     message: res.msg,
@@ -660,7 +689,7 @@ export default {
               })
             }else{
               updateDot(this.itemObj).then(res=>{
-                this.loadingBootm = false
+                // this.loadingBootm = false
                 if(res.code == 200){
                   this.$message({
                     message: '操作成功',
@@ -702,22 +731,44 @@ export default {
         })
       }
     },
-    changeCity(){
-      areaJson.forEach(val =>{
-          if(this.itemObj.province === val.n){
-          this.cityList = val.s
-          this.itemObj.city = this.cityList[0].n
-          this.itemObj.region = this.cityList[0].s[0].n
-          }
+    ApiAreaJson(){
+      findYuyueProvinces().then(res=>{
+        this.areaJson = res.data
       })
     },
+    changeCity(){
+      var id
+      this.areaJson.forEach(v=>{
+        if(v.province === this.itemObj.province){
+          id = v.provinceid
+        }
+      })
+      findYuyueCityByProvinceid({provinceid: id}).then(res=>{
+        this.cityList = res.data
+        this.itemObj.city = this.cityList[0].city
+        this.itemObj.cityid = this.cityList[0].cityid
+        this.changeCounty()
+      })
+      // areaJson.forEach(val =>{
+      //     if(this.itemObj.province === val.n){
+      //     this.cityList = val.s
+      //     this.itemObj.city = this.cityList[0].n
+      //     this.itemObj.region = this.cityList[0].s[0].n
+      //     }
+      // })
+    },
     changeCounty(){
-       this.cityList.forEach(item=>{
-            if(this.itemObj.city === item.n){
-              this.countyList = item.s
-              this.itemObj.region = this.countyList[0].n
-            }
-        })
+      findYuyueAreasByCityid({cityid:this.itemObj.cityid}).then(res=>{
+        this.countyList = res.data
+        this.itemObj.region = this.countyList[0].area
+        this.itemObj.regionId = this.countyList[0].areaid
+      })
+      //  this.cityList.forEach(item=>{
+      //       if(this.itemObj.city === item.n){
+      //         this.countyList = item.s
+      //         this.itemObj.region = this.countyList[0].n
+      //       }
+      //   })
     },
     pass(item){
       this.passDialog = true
@@ -734,7 +785,7 @@ export default {
         examineDot({status:this.passRadio,dotCode:this.itemObj.dotCode}).then(res=>{
           if(res.code == 200){
             this.$message({
-              message: '审批成功！',
+              message: '操作成功！',
               type: 'success'
             });
             this.passDialog = false

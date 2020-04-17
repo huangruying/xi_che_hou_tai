@@ -4,13 +4,18 @@
     <div class="query">
        <div class="input_box">
           <el-input
-          v-model="queryList.dotCode"
+          v-model="queryList.id"
           placeholder="请输入账号ID"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
           <el-input
           v-model="queryList.dotName"
-          placeholder="网点名称"
+          placeholder="请输入网点名称"
+          class="input fl"
+          @keyup.enter.native="handleFilter"/>
+           <el-input
+          v-model="queryList.phone"
+          placeholder="请输入手机号码"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
           <el-select v-model="queryList.status" @change="getData" class="input fl" placeholder="状态">
@@ -21,51 +26,27 @@
               :key="item.value"
             ></el-option>
           </el-select>
-          <el-select v-model="queryList.nodeTypes" @change="getData" class="input fl" placeholder="网点类型">
+          <el-select v-model="queryList.nodeTypes" @change="getData" class="input fl" placeholder="类型">
             <el-option
               v-for="item in nodeTypesList"
-              :label="item.name"
-              :value="item.value"
-              :key="item.value"
+              :label="item.washType"
+              :value="item.id"
+              :key="item.id"
             ></el-option>
           </el-select>
           <el-date-picker
-          class="picker fl"
+            class="input fl"
+            style="width:260px"
             v-model="queryList.time"
             type="daterange"
+            format="yyyy 年 MM 月 dd 日"
+            value-format="yyyy-MM-dd"
             range-separator="至"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
             @change="getData"
           ></el-date-picker>
        </div> 
-       <div class="input_box">
-          <el-input
-          v-model="queryList.province"
-          placeholder="请输入省份"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-           <el-input
-          v-model="queryList.city"
-          placeholder="请输入城市"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-           <el-input
-          v-model="queryList.region"
-          placeholder="请输入区/县"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-           <el-input
-          v-model="queryList.recommender"
-          placeholder="推荐人"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-           <el-input
-          v-model="queryList.phone"
-          placeholder="手机号码"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-       </div>
        <div class="btn_box">
          <div>
            <el-button type="primary" icon="el-icon-search" @click="getData">搜索</el-button>
@@ -73,6 +54,7 @@
          </div>
          <div>
            <el-button type="primary" icon="el-icon-refresh" @click="resetGetData"></el-button>
+            <el-button type="primary" @click="newly">新增</el-button>
          </div>
        </div>
     </div>
@@ -81,11 +63,12 @@
       :data="data.data"
       border
       stripe
+      fit
       style="width: 100%;">
       <!-- fit highlight-current-row -->
-      <el-table-column label="网点编号" prop="dotCode" fixed align="center">
+      <el-table-column label="账号ID" prop="id" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.dotCode }}</span>
+          <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
       <!-- <el-table-column label="网点类型" prop="realname" align="center">
@@ -93,52 +76,37 @@
           <span>{{ scope.row.realname }}</span>
         </template>
       </el-table-column> -->
+      <el-table-column label="用户名" prop="username" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.username }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="手机号码" prop="phone" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.phone }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="状态" prop="statusCopy" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.statusCopy }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="类型" prop="dotType" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.dotType }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="网点名称" prop="dotName" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.dotName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="客服电话" prop="mobile" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.mobile }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="省份" prop="province" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.province }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="市" prop="city" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.city }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="区/县" prop="region" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.region }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="详细地址" prop="address" align="center" width="250">
-        <template slot-scope="scope">
-          <span>{{ scope.row.address }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="推荐人" prop="recommender" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.recommender }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="审核状态" prop="status" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.status }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="创建时间" prop="createTime" align="center" width="170">
+      <el-table-column label="创建日期" prop="createTime" align="center" width="250">
         <template slot-scope="scope">
           <span>{{ scope.row.createTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="230" fixed="right" prop="audit_status" align="center">
+      <el-table-column label="操作" width="200" fixed="right" prop="audit_status" align="center">
         <template slot-scope="scope">
           <el-button size="mini" type="primary" @click="compile(scope.row)">编辑</el-button>
         </template>
@@ -151,39 +119,56 @@
       :limit.sync="data.per_page"
       @pagination="getPageData"
     />
-    <!-- 弹窗查看 -->
+    <!-- 弹窗编辑新增 -->
     <el-dialog
       :title="dialogTitle"
       :visible.sync="editDialog"
-      width="60%"
+      width="40%"
       @close="close"
       center>
       <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
-         <el-divider content-position="left"><span class="title">银行账户信息</span></el-divider>
-         <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">
-           <el-form-item label="户名:" prop="accountName" style="width:50%">
-              <el-input v-model="itemObj.accountName" style="width:210px" :disabled="inputDisabled"></el-input>
+           <!-- <span class="title">账号信息</span> -->
+           <el-form-item label="用户名:" prop="username" style="width:100%">
+              <el-input v-model="itemObj.username" style="width:210px"></el-input>
            </el-form-item>
-           <el-form-item label="账户:" prop="account" style="width:50%">
-              <el-input v-model="itemObj.account" style="width:210px" :disabled="inputDisabled"></el-input>
+           <el-form-item label="手机号码:" prop="phone" style="width:100%">
+              <el-input v-model="itemObj.phone" style="width:210px"></el-input>
            </el-form-item>
-           <el-form-item label="开户行:" prop="openingBank" style="width:50%">
-              <el-input v-model="itemObj.openingBank" style="width:210px" :disabled="inputDisabled"></el-input>
+           <el-form-item label="用户密码:" prop="password" style="width:100%">
+              <el-input v-model="itemObj.password" style="width:210px" type="password"></el-input>
            </el-form-item>
-         </div>
+           <el-form-item label="状态:" prop="status" style="width:100%">
+             <el-switch
+              v-model="itemObj.status"
+              active-color="#13ce66">
+            </el-switch>
+           </el-form-item>
+           <el-form-item label="类型:" prop="dotType" style="width:100%">
+              <el-select v-model="itemObj.dotType" @change="getData" tyle="width:210px" placeholder="类型" :disabled="inputDisabled">
+                <el-option
+                  v-for="item in nodeTypesList"
+                  :label="item.washType"
+                  :value="item.id"
+                  :key="item.id"
+                ></el-option>
+              </el-select>
+           </el-form-item>
+           <el-form-item label="网点名称:" prop="dotName" style="width:100%">
+              <el-input v-model="itemObj.dotName" style="width:210px" :disabled="inputDisabled"></el-input>
+           </el-form-item>
        </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="editDialog = false">取 消</el-button>
-        <el-button type="primary" :loading="loadingBootm" @click="editDialogVisible" v-if="compileBtn">确 定</el-button>
+        <el-button type="primary" :loading="loadingBootm" @click="editDialogVisible">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getList , examineDot , dotOssUpload , updateDot , saveDot , dotExport} from '@/api/nodeList'
+import { findDotUserInfos , saveDotUser , findCarwashTypeInfos , updateDotUserById} from '@/api/account'
 import Pagination from "@/components/Pagination"
-import areaJson from '@/utils/city_data'
+// import areaJson from '@/utils/city_data'
 export default {
   // filters: {
   //   statusFilter(status) {
@@ -217,41 +202,34 @@ export default {
       thishostName: '',
       loadingBootm: false,
       urlBl: false,
-      compileBtn: false,
       alterDisabled: false,
       inputDisabled: false,
-      disabledBtn: false,
       passRadio: null,
       loading: false,
       passDialog: false,
       editDialog: false,
-      areaJson:areaJson,
-      itemObj: {},
+      // areaJson:areaJson,
+      itemObj: {
+        openingBank: false
+      },
       rules: {
-          dotCode: [
+          username: [
             { required: true, message: '不能为空', trigger: 'blur' },
             // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
           ],
-          region: [
-            { required: true, message: '请选择区域', trigger: 'change' }
+          password: [
+            { required: true, message: '不能为空', trigger: 'blur' },
+            { min: 3, max: 6, message: '长度在 3 到 6 个字符', trigger: 'blur' }
           ],
-          city: [
-            { required: true, message: '请选择区域', trigger: 'change' }
-          ],
-          province: [
-            { required: true, message: '请选择区域', trigger: 'change' }
+          dotType: [
+            { required: true, message: '请选择类型', trigger: 'change' }
           ],
           dotName: [
             { required: true, message: '不能为空', trigger: 'blur' },
             // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
           ],
-          date: [
-             { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
-          ],
-          storePhone: [
-            { validator: storePhone, trigger: 'blur' }
-          ],
-          chargePhone: [
+          phone: [
+            { required: true, message: '不能为空', trigger: 'blur' },
             { validator: storePhone, trigger: 'blur' }
           ]
       },
@@ -264,90 +242,59 @@ export default {
         link: ""
       },
       queryList: {
-        dotCode: null,
+        id: null,
         status: null,
         dotName: null,
-        province: null,
-        city: null,
-        region: null,
         phone: null,
         nodeTypes: null,
-        recommender: null,
         time: ["", ""],
       },
       statusList: [
         {
-          name: '待上传资料',
+          name: '启用',
           value: 1
         },
         {
-          name: '待审批',
-          value: 2
+          name: '禁用',
+          value: 0
         },
-        {
-          name: '审批通过',
-          value: 3
-        },
-        {
-          name: '已驳回',
-          value: 4
-        }
       ],
-      nodeTypesList: [
-        {
-          name: '网点类型',
-          value: 1
-        },
-        {
-          name: '车行',
-          value: 2
-        },
-        {
-          name: '检测站',
-          value: 3
-        },
-        {
-          name: '代办机构',
-          value: 4
-        }
-      ]
+      nodeTypesList: []
     }
   },
   created() {
     this.getData()
+    this.apiTypeInfos()
     this.thishostName = `${location.protocol}//${location.hostname}`
   },
   methods: {
+    apiTypeInfos(){
+      findCarwashTypeInfos().then(res=>{
+        this.nodeTypesList = res.data
+      })
+    },
     getData(filter){
       this.loading = true
       let data = {}
       var queryList = this.queryList
-      if (queryList.dotCode) {
-        data.dotCode = queryList.dotCode
+      if (queryList.id) {
+        data.id = queryList.id
       }
-      if (queryList.status) {
+      if (!queryList.status) {
         data.status = queryList.status
       }
       if (queryList.dotName) {
         data.dotName = queryList.dotName
       }
-      if (queryList.province) {
-        data.province = queryList.province
-      }
-      if (queryList.city) {
-        data.city = queryList.city
-      }
-      if (queryList.region) {
-        data.region = queryList.region
-      }
-      if (queryList.chargePhone   ) {
-        data.chargePhone = queryList.chargePhone   
-      }
-      if (queryList.recommender) {
-        data.recommender = queryList.recommender
+      if (queryList.phone   ) {
+        data.phone = queryList.phone   
       }
       if (queryList.nodeTypes) {
         data.nodeTypes = queryList.nodeTypes
+      }
+      if (queryList.time[0] && queryList.time[1]) {
+        data.startTime = queryList.time[0]
+        data.endTime = queryList.time[1]
       }
       if (filter && this.data.current_page > 1) {
         data.page = this.data.current_page;
@@ -357,17 +304,26 @@ export default {
       // data.username = this.$store.state.user.name
       data.pageNum = this.data.current_page
       data.pageSize = this.data.per_page
-      getList(data).then(res=>{
+      console.log(data);
+      findDotUserInfos(data).then(res=>{
         // console.log(res);
+        this.data = res;
         this.loading = false;
         if (res.data.length <= 0) {
           this.$message("暂无数据~")
         }
         if( res.data.length > 0){
-          this.data = res;
           this.data.current_page = res.pageNum
           this.data.per_page = res.pageSize
           this.data.total = res.total
+          this.data.data.forEach(v=>{
+            if(v.status == 1){
+              v.statusCopy = "启用"
+            }else if(v.status == 0){
+              v.statusCopy = "禁用"
+            }
+            
+          })
         }
       })
     },
@@ -382,10 +338,13 @@ export default {
       this.editDialog = true
       this.dialogTitle = "编辑"
       this.itemObj = item
-      this.alterDisabled = true
+      this.inputDisabled = true
+    },
+    newly(){
+      this.editDialog = true
+      this.dialogTitle = "新增"
       this.inputDisabled = false
-      this.disabledBtn = false
-      this.compileBtn = true
+      this.urlBl = true
     },
     editDialogVisible(){
       // 使用ES6的Object.keys()方法,是ES6的新方法, 返回值也是对象中属性名组成的数组
@@ -394,8 +353,13 @@ export default {
       this.$refs['ruleForm'].validate((valid) => {
           if (valid) {
             this.loadingBootm = true
+            if(this.itemObj.status){
+              this.itemObj.status = 1
+            }else{
+              this.itemObj.status = 2
+            }
             if(this.urlBl){
-              saveDot(this.itemObj).then(res=>{
+              saveDotUser(this.itemObj).then(res=>{
                 this.loadingBootm = false
                 if(res.code == 200){
                   this.$message({
@@ -412,7 +376,7 @@ export default {
                 console.log(res);
               })
             }else{
-              updateDot(this.itemObj).then(res=>{
+              updateDotUserById(this.itemObj).then(res=>{
                 this.loadingBootm = false
                 if(res.code == 200){
                   this.$message({
@@ -464,6 +428,9 @@ export default {
 .title{
   font-size: 18px;
   font-weight: 600;
+}
+/deep/.el-dialog__header{
+  background: #f8f8f8;
 }
 /deep/.el-divider--horizontal{
   margin: 0;

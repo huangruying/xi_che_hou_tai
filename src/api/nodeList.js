@@ -62,3 +62,35 @@ export function dotExport(params) {
     params
   })
 }
+
+export function findCarwashTypeInfos(data) {
+  return request({
+    url: '/wash/findCarwashTypeInfos',
+    method: 'post',
+    data
+  })
+}
+
+export function findYuyueProvinces(params) {
+  return request({
+    url: '/areas/findYuyueProvinces',
+    method: 'get',
+    params
+  })
+}
+
+export function findYuyueCityByProvinceid(params) {
+  return request({
+    url: '/areas/findYuyueCityByProvinceid',
+    method: 'get',
+    params
+  })
+}
+
+export function findYuyueAreasByCityid(params) {
+  return request({
+    url: '/areas/findYuyueAreasByCityid',
+    method: 'get',
+    params
+  })
+}
