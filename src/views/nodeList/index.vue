@@ -25,7 +25,7 @@
             <el-option
               v-for="item in nodeTypesList"
               :label="item.washType"
-              :value="item.id"
+              :value="item.washType"
               :key="item.id"
             ></el-option>
           </el-select>
@@ -531,20 +531,16 @@ export default {
       },
       statusList: [
         {
-          name: '待上传资料',
-          value: 1
-        },
-        {
           name: '待审批',
-          value: 2
+          value: 0
         },
         {
           name: '审批通过',
-          value: 3
+          value: 1
         },
         {
           name: '已驳回',
-          value: 4
+          value: 2
         }
       ],
       nodeTypesList: []
@@ -570,7 +566,7 @@ export default {
       if (queryList.dotCode) {
         data.dotCode = queryList.dotCode
       }
-      if (!queryList.status) {
+      if (queryList.status) {
         data.status = queryList.status
       }
       if (queryList.dotName) {
@@ -591,6 +587,9 @@ export default {
       if (queryList.recommender) {
         data.recommender = queryList.recommender
       }
+      if (queryList.dotType) {
+        data.dotType = queryList.dotType   
+      }
       if (queryList.nodeTypes) {
         data.nodeTypes = queryList.nodeTypes
       }
@@ -609,10 +608,7 @@ export default {
       getList(data).then(res=>{
         // console.log(res);
         this.loading = false;
-        if (res.data.length <= 0) {
-          this.$message("暂无数据~")
-        }
-        if( res.data.length > 0){
+        if( res.data && res.data.length > 0){
           this.data = res;
           this.data.current_page = res.pageNum
           this.data.per_page = res.pageSize
@@ -626,6 +622,9 @@ export default {
               v.statusCopy = "已驳回"
             }       
           })
+        }else{
+          this.$message("暂无数据~")
+          this.data.data = []
         }
       })
     },
