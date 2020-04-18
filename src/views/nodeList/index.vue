@@ -21,12 +21,12 @@
               :key="item.value"
             ></el-option>
           </el-select>
-          <el-select v-model="queryList.dotType" @change="getData" class="input fl" placeholder="网点类型">
+          <el-select v-model="queryList.mechanismName" @change="getData" class="input fl" placeholder="网点类型">
             <el-option
               v-for="item in nodeTypesList"
-              :label="item.washType"
-              :value="item.washType"
-              :key="item.id"
+              :label="item.name"
+              :value="item.mechanismName"
+              :key="item.name"
             ></el-option>
           </el-select>
           <el-date-picker
@@ -92,9 +92,9 @@
           <span>{{ scope.row.dotCode }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="网点类型" prop="dotType" align="center">
+      <el-table-column label="网点类型" prop="mechanismName" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.dotType }}</span>
+          <span>{{ scope.row.mechanismName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="网点名称" prop="dotName" align="center">
@@ -195,16 +195,26 @@
             <el-form-item label="网点简称:" prop="dotAbbreviation" style="width:50%">
               <el-input v-model="itemObj.dotAbbreviation" style="width:210px" :disabled="inputDisabled"></el-input>
             </el-form-item>
-            <el-form-item label="网点类型:" prop="dotType" style="width:50%">
-              <el-select v-model="itemObj.dotType" style="width:210px" placeholder="网点类型">
+            <el-form-item label="网点类型:" prop="mechanismName" style="width:50%">
+              <el-select v-model="itemObj.mechanismName" style="width:210px" placeholder="网点类型">
                 <el-option
                   v-for="item in nodeTypesList"
-                  :label="item.washType"
-                  :value="item.washType"
+                  :label="item.name"
+                  :value="item.mechanismName"
+                  :key="item.name"
+                ></el-option>
+              </el-select>
+              <!-- <el-input v-model="itemObj.mechanismName" style="width:210px" :disabled="inputDisabled"></el-input> -->
+            </el-form-item>
+            <el-form-item label="所属机构:" prop="" style="width:50%">
+              <el-select v-model="itemObj.mechanismId" style="width:210px" placeholder="所属机构">
+                <el-option
+                  v-for="item in organizationList"
+                  :label="item.mechanismName"
+                  :value="item.id"
                   :key="item.id"
                 ></el-option>
               </el-select>
-              <!-- <el-input v-model="itemObj.dotType" style="width:210px" :disabled="inputDisabled"></el-input> -->
             </el-form-item>
             <el-form-item label="客服电话:" prop="mobile" style="width:50%">
               <el-input v-model="itemObj.mobile" style="width:210px" :disabled="inputDisabled"></el-input>
@@ -348,6 +358,23 @@
                 action=""
                 :auto-upload="false"
                 :show-file-list="false"
+                :on-change="handleChange5"
+                :file-list="fileList_5"
+                :before-upload="beforeAvatarUpload">
+                <img v-if="itemObj.honorImage" :src="itemObj.honorImage" class="avatar">
+                <i v-else class="el-icon-plus avatar-uploader-icon">上传其他荣誉照片</i>
+                <div class="text">上传其他荣誉照片</div>
+                <el-button size="mini" type="primary" plain class="btn">+上传</el-button>
+              </el-upload>
+              <a :href="itemObj.honorImage" target="_blank" class="uploadTransparency"></a>
+            </div>
+            <div class="textUp">
+              <el-upload
+                :disabled="disabledBtn"
+                class="avatar-uploader"
+                action=""
+                :auto-upload="false"
+                :show-file-list="false"
                 :on-change="handleChange3"
                 :file-list="fileList_3"
                 :before-upload="beforeAvatarUpload">
@@ -382,23 +409,6 @@
                 action=""
                 :auto-upload="false"
                 :show-file-list="false"
-                :on-change="handleChange5"
-                :file-list="fileList_5"
-                :before-upload="beforeAvatarUpload">
-                <img v-if="itemObj.honorImage" :src="itemObj.honorImage" class="avatar">
-                <i v-else class="el-icon-plus avatar-uploader-icon">上传其他荣誉照片</i>
-                <div class="text">上传其他荣誉照片</div>
-                <el-button size="mini" type="primary" plain class="btn">+上传</el-button>
-              </el-upload>
-              <a :href="itemObj.honorImage" target="_blank" class="uploadTransparency"></a>
-            </div>
-            <div class="textUp">
-              <el-upload
-                :disabled="disabledBtn"
-                class="avatar-uploader"
-                action=""
-                :auto-upload="false"
-                :show-file-list="false"
                 :on-change="handleChange6"
                 :file-list="fileList_6"
                 :before-upload="beforeAvatarUpload">
@@ -421,7 +431,7 @@
 </template>
 
 <script>
-import { getList , examineDot , dotOssUpload , updateDot , saveDot , dotExport , findCarwashTypeInfos , findYuyueProvinces , findYuyueCityByProvinceid , findYuyueAreasByCityid} from '@/api/nodeList'
+import { getList , examineDot , dotOssUpload , updateDot , saveDot , dotExport , findCarwashTypeInfos , findYuyueProvinces , findYuyueCityByProvinceid , findYuyueAreasByCityid , findMechanismName} from '@/api/nodeList'
 import Pagination from "@/components/Pagination"
 // import areaJson from '@/utils/city_data'
 export default {
@@ -490,7 +500,7 @@ export default {
           province: [
             { required: true, message: '请选择区域', trigger: 'change' }
           ],
-          dotType: [
+          mechanismName: [
             { required: true, message: '请选择网点类型', trigger: 'change' }
           ],
           dotName: [
@@ -500,14 +510,14 @@ export default {
           date: [
              { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
           ],
-          storePhone: [
-            { required: true, message: '不能为空', trigger: 'blur' },
-            { validator: storePhone, trigger: 'blur' }
-          ],
-          chargePhone: [
-            { required: true, message: '不能为空', trigger: 'blur' },
-            { validator: storePhone, trigger: 'blur' }
-          ]
+          // storePhone: [
+          //   { required: true, message: '不能为空', trigger: 'blur' },
+          //   { validator: storePhone, trigger: 'blur' }
+          // ],
+          // chargePhone: [
+          //   { required: true, message: '不能为空', trigger: 'blur' },
+          //   { validator: storePhone, trigger: 'blur' }
+          // ]
       },
       data: {
         current_page: 1,
@@ -543,22 +553,33 @@ export default {
           value: 2
         }
       ],
-      nodeTypesList: []
+      nodeTypesList: [
+        {
+          name: '车行',
+          mechanismName: 1
+        },
+        {
+          name: '代办机构',
+          mechanismName: 2
+        },
+      ],
+      organizationList: []
     }
   },
   created() {
     this.getData()
-    this.apiTypeInfos()
+    // this.apiTypeInfos()
     this.thishostName = `${location.protocol}//${location.hostname}`
     // 省市区
     this.ApiAreaJson()
   },
   methods: {
-    apiTypeInfos(){
-      findCarwashTypeInfos().then(res=>{
-        this.nodeTypesList = res.data
-      })
-    },
+    // apiTypeInfos(){
+    //   findCarwashTypeInfos().then(res=>{
+    //     this.nodeTypesList = res.data
+    //     console.log(res);
+    //   })
+    // },
     getData(filter){
       this.loading = true
       let data = {}
@@ -587,8 +608,8 @@ export default {
       if (queryList.recommender) {
         data.recommender = queryList.recommender
       }
-      if (queryList.dotType) {
-        data.dotType = queryList.dotType   
+      if (queryList.mechanismName) {
+        data.mechanismName = queryList.mechanismName   
       }
       if (queryList.nodeTypes) {
         data.nodeTypes = queryList.nodeTypes
@@ -634,6 +655,13 @@ export default {
     getPageData(e) {
       this.getData("page");
     },
+    apiFindMechanismName(){
+      findMechanismName().then(res=>{
+        if(res.code == 200){
+          this.organizationList = res.data         
+        }
+      })
+    },
     edit(item){
       this.editDialog = true
       this.dialogTitle = "查看"
@@ -652,6 +680,7 @@ export default {
       this.inputDisabled = false
       this.disabledBtn = false
       this.compileBtn = true
+      this.apiFindMechanismName()
     },
     newly(val){
       this.editDialog = true
@@ -661,6 +690,7 @@ export default {
       this.disabledBtn = false
       this.compileBtn = true
       this.urlBl = val
+      this.apiFindMechanismName()
     },
     editDialogVisible(){
       // 使用ES6的Object.keys()方法,是ES6的新方法, 返回值也是对象中属性名组成的数组
@@ -713,7 +743,7 @@ export default {
       // console.log(this.data.data);
       if(this.data.data.length <= 0){
         this.$message({
-            message: '暂无数据~',
+            message: '暂无数据可导出~',
             type: 'warning'
           })
       }else{

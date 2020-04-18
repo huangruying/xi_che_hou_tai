@@ -94,3 +94,11 @@ export function findYuyueAreasByCityid(params) {
     params
   })
 }
+
+export function findMechanismName(data) {
+  return request({
+    url: '/wash/findMechanismName',
+    method: 'post',
+    data
+  })
+}
