@@ -66,41 +66,71 @@
       fit
       style="width: 100%;">
       <!-- fit highlight-current-row -->
-      <el-table-column label="账号ID" prop="id" fixed align="center">
+      <el-table-column label="订单编号" prop="orderCode" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
+          <span>{{ scope.row.orderCode }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="用户名" prop="username" align="center">
+      <el-table-column label="车行名称" prop="garageName" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.username }}</span>
+          <span>{{ scope.row.garageName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="手机号码" prop="phone" align="center">
+      <el-table-column label="车牌号" prop="garageName" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.garageName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="联系人" prop="contacts" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.contacts }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="手机号" prop="phone" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.phone }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="姓名" prop="name" align="center">
+      <el-table-column label="订单状态" prop="orderStatus" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.name }}</span>
+          <span>{{ scope.row.orderStatus }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="地址" prop="address" align="center">
+      <el-table-column label="订单来源" prop="orderSource" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.address }}</span>
+          <span>{{ scope.row.orderSource }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建日期" prop="createTime" align="center" width="250">
+      <el-table-column label="项目名称" prop="projectName" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.createTime }}</span>
+          <span>{{ scope.row.projectName }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="操作" width="200" fixed="right" prop="audit_status" align="center">
+      <el-table-column label="应收金额" prop="money" align="center">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="compile(scope.row)">编辑</el-button>
+          <span>{{ scope.row.money }}</span>
         </template>
-      </el-table-column> -->
+      </el-table-column>
+      <el-table-column label="预约时间" prop="appointmentTime" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.appointmentTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="下单时间" prop="placeTime" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.placeTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="备注" prop="remarks" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.remarks }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="200" fixed="right" prop="audit_status" align="center">
+        <template slot-scope="scope">
+          <el-button size="mini" type="primary" @click="compile(scope.row)">查询</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <pagination
       v-show="data.total>0"
@@ -266,13 +296,14 @@ export default {
       data.pageNum = this.data.current_page
       data.pageSize = this.data.per_page
       findServiceOrderInfos(data).then(res=>{
-        // console.log(res);
-        this.data = res;
+        console.log(res);
+        // this.data = res;
         this.loading = false;
-        if (res.data.length <= 0) {
+        if (!res.data || res.data.length <= 0) {
           this.$message("暂无数据~")
         }
-        if( res.data.length > 0){
+        if( res.data && res.data.length > 0){
+          this.data = res;
           this.data.current_page = res.pageNum
           this.data.per_page = res.pageSize
           this.data.total = res.total
