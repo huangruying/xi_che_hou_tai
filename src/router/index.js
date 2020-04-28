@@ -32,6 +32,13 @@ import Layout from '@/layout'
  */
 export const constantRoutes = [
   {
+    name: 'default',
+    path: '/',
+    // 默认打开登录页
+    redirect: { path: '/login' }
+  },
+  
+  {
     path: '/login',
     component: () => import('@/views/login/index'),
     hidden: true
@@ -44,9 +51,9 @@ export const constantRoutes = [
   },
 
   {
-    path: '/',
+    path: '/index',
     component: Layout,
-    redirect: 'dashboard',
+    redirect: { name: 'dashboard' },
     children: [
       {
         path: 'dashboard',

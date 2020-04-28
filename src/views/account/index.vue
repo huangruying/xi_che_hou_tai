@@ -29,8 +29,8 @@
           <el-select v-model="queryList.nodeTypes" @change="getData" class="input fl" placeholder="类型">
             <el-option
               v-for="item in nodeTypesList"
-              :label="item.washType"
-              :value="item.id"
+              :label="item.type"
+              :value="item.type"
               :key="item.id"
             ></el-option>
           </el-select>
@@ -86,14 +86,14 @@
           <span>{{ scope.row.phone }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" prop="statusCopy" align="center">
+      <el-table-column label="状态" prop="status" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.statusCopy }}</span>
+          <span>{{ scope.row.status }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="类型" prop="dotType" align="center">
+      <el-table-column label="类型" prop="type" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.dotType }}</span>
+          <span>{{ scope.row.type }}</span>
         </template>
       </el-table-column>
       <el-table-column label="网点名称" prop="dotName" align="center">
@@ -146,9 +146,9 @@
            <el-form-item label="类型:" prop="dotType" style="width:100%">
               <el-select v-model="itemObj.dotType" @change="getData" tyle="width:210px" placeholder="类型" :disabled="inputDisabled">
                 <el-option
-                  v-for="item in nodeTypesList"
-                  :label="item.washType"
-                  :value="item.id"
+                  v-for="item in nodeTypesList2"
+                  :label="item.type"
+                  :value="item.type"
                   :key="item.id"
                 ></el-option>
               </el-select>
@@ -259,17 +259,37 @@ export default {
           value: 0
         },
       ],
-      nodeTypesList: []
+      nodeTypesList: [
+        {
+          type: '车行',
+          id: 0
+        },
+        {
+          type: '代办机构',
+          id: 1
+        }
+      ],
+      nodeTypesList2: [
+        {
+          type: '车行',
+          id: 0
+        },
+        {
+          type: '代办机构',
+          id: 1
+        }
+      ]
     }
   },
   created() {
     this.getData()
-    this.apiTypeInfos()
+    // this.apiTypeInfos()
     this.thishostName = `${location.protocol}//${location.hostname}`
   },
   methods: {
     apiTypeInfos(){
       findCarwashTypeInfos().then(res=>{
+        // console.log(res);
         this.nodeTypesList = res.data
       })
     },
@@ -304,9 +324,9 @@ export default {
       // data.username = this.$store.state.user.name
       data.pageNum = this.data.current_page
       data.pageSize = this.data.per_page
-      console.log(data);
+      // console.log(data);
       findDotUserInfos(data).then(res=>{
-        // console.log(res);
+        console.log(res);
         this.data = res;
         this.loading = false;
         if (res.data.length <= 0) {

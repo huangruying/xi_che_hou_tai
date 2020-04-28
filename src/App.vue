@@ -6,6 +6,14 @@
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  data (){
+    return{
+
+    }
+  },
+  methods: {
+    //  let url = window.location.href.split('#')[0]
+  }
 }
 </script>

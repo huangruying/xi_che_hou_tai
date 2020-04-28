@@ -59,9 +59,9 @@
           <span>{{ scope.row.realname }}</span>
         </template>
       </el-table-column> -->
-      <el-table-column label="用户名" prop="username" align="center">
+      <el-table-column label="用户名" prop="name" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.username }}</span>
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="手机号码" prop="phone" align="center">

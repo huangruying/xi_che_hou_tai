@@ -41,6 +41,13 @@
         </span>
       </el-form-item>
 
+      <div class="code-wrap">
+        <el-form-item prop="code">
+          <el-input v-model="loginForm.code" name="code" type="text" placeholder="请输入验证码" @keyup.enter.native="handleLogin"/>
+        </el-form-item>
+        <div id="authcode"></div>
+      </div>
+
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
 
       <div class="tips">
@@ -55,6 +62,7 @@
 <script>
 import { validUsername } from '@/utils/validate'
 // import { login } from '@/api/user'
+import GVerify from '@/utils/authCode' // 验证码
 export default {
   name: 'Login',
   data() {
@@ -72,14 +80,26 @@ export default {
         callback()
       }
     }
+    const validateUserCode = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('请输入验证码'))
+      }
+      if (!this.obj.validate(value)) {
+        callback(new Error('验证码错误'))
+      } else {
+        callback()
+      }
+    }
     return {
       loginForm: {
         username: 'admin',
-        password: '123456'
+        password: '123456',
+        code: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        code: [{ required: true, trigger: 'blur', validator: validateUserCode }]
       },
       loading: false,
       passwordType: 'password',
@@ -93,6 +113,12 @@ export default {
       },
       immediate: true
     }
+  },
+  mounted() {
+    this.$nextTick((i) => {
+      this.obj = new GVerify({ id: 'authcode' })
+    })
+    // this.loginForm.username = this.$store.getters.username
   },
   methods: {
     showPwd() {
@@ -118,7 +144,8 @@ export default {
                 message: "登录成功！",
                 type: 'success'
             })
-            this.$router.push({ path: this.redirect || '/' })
+            // this.$router.push({ path: this.redirect || '/index' })
+            this.$router.push({ path: '/index' })
             this.loading = false
           }).catch(() => {
             this.loading = false
@@ -164,7 +191,27 @@ $cursor: #fff;
     color: $cursor;
   }
 }
-
+.code-wrap{
+  width: 100%;
+  display: flex;
+  .el-form-item{
+    flex: 1;
+    display: inline-block;
+    // width: 70%;
+    vertical-align: top;
+  }
+  #authcode{
+    flex: 0 0 100px;
+    // width: 100px;
+    height: 44px;
+    border-radius: 5px;
+    display: inline-block;
+    vertical-align: top;
+    margin-bottom: 22px;
+    margin-left: 20px;
+    margin-top: 3px;
+  }
+}
 /* reset element-ui css */
 .login-container {
   .el-input {

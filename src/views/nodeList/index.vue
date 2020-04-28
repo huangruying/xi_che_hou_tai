@@ -434,6 +434,7 @@
 import { getList , examineDot , dotOssUpload , updateDot , saveDot , dotExport , findCarwashTypeInfos , findYuyueProvinces , findYuyueCityByProvinceid , findYuyueAreasByCityid , findMechanismName} from '@/api/nodeList'
 import Pagination from "@/components/Pagination"
 // import areaJson from '@/utils/city_data'
+import axios from 'axios'
 export default {
   // filters: {
   //   statusFilter(status) {
@@ -587,7 +588,14 @@ export default {
       if (queryList.dotCode) {
         data.dotCode = queryList.dotCode
       }
-      if (queryList.status) {
+      // if (queryList.status) {
+      //   data.status = queryList.status
+      //   console.log(data.status);
+      //   // console.log(typeof queryList.status);
+      //   // console.log(queryList.status);
+      // }
+      if(queryList.status == null){
+      }else{
         data.status = queryList.status
       }
       if (queryList.dotName) {
@@ -747,17 +755,39 @@ export default {
             type: 'warning'
           })
       }else{
+        // axios({
+        //     url: 'http://192.168.0.161:8182/yuyuetrip/wash/dotExport',
+        //     method: 'get',
+        //     params: { pageNum: this.data.current_page , pageSize: this.data.per_page}
+        //   })
+      //   queryList: {
+      //   dotCode: null,
+      //   status: null,
+      //   dotName: null,
+      //   province: null,
+      //   city: null,
+      //   region: null,
+      //   phone: null,
+      //   nodeTypes: null,
+      //   recommender: null,
+      //   time: ["", ""],
+      // },
+      var {dotCode,status,dotName,province,city,region,phone,nodeTypes,recommender,time} = this.queryList
+        var startTime = time[0]
+        var endTime = time[1]
+        window.location.href = `http://192.168.0.161:8182/yuyuetrip/wash/dotExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}&status=${status}&dotCode=${dotCode}&dotName=${dotName}&province=${province}&city=${city}&region=${region}&phone=${phone}&nodeTypes=${nodeTypes}&recommender=${recommender}&startTime=${startTime}&endTime=${endTime}`
         // row.exportDatabtn = false
-        dotExport({ pageNum: this.data.current_page,pageSize: this.data.per_page}).then(res => {
-          // console.log(res);
-          // this.$message({
-          //   message: '操作成功',
-          //   type: 'success'
-          // })
-          // this.down(`${this.thishostName}${res.url}`)
+        // dotExport({ pageNum: this.data.current_page , pageSize: this.data.per_page}).then(res => {
+        //   console.log(res);
+        //   // console.log(res);
+        //   // this.$message({
+        //   //   message: '操作成功',
+        //   //   type: 'success'
+        //   // })
+        //   // this.down(`${this.thishostName}${res.url}`)
 
-          // row.exportDatabtn = false
-        })
+        //   // row.exportDatabtn = false
+        // })
       }
     },
     ApiAreaJson(){

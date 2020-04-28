@@ -20,6 +20,7 @@ const mutations = {
     state.data = {}
     state.name = ''
     state.avatar = ''
+    localStorage.removeItem('avatar');
     // Object.assign(state, getDefaultState())
   },
   // SET_TOKEN: (state, token) => {
@@ -29,6 +30,7 @@ const mutations = {
     state.data = data
     state.name = data.username
     state.avatar = data.pic
+    localStorage.setItem('avatar',data.pic)
   },
   SET_NAME: (state, name) => {
     state.name = name
@@ -46,6 +48,7 @@ const actions = {
       login({ username: username.trim(), password: password }).then(response => {
         const { data } = response
         commit('SET_TOKEN', data)
+        localStorage.setItem('username',data.username)
         resolve()
       }).catch(error => {
         reject(error)

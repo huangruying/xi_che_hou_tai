@@ -8,6 +8,7 @@
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
           <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
+          <span>{{userName}}</span>
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
@@ -46,18 +47,30 @@ export default {
     ...mapGetters([
       'sidebar',
       'avatar'
-    ])
+    ]),
+    userName(){
+      var name = localStorage.getItem('username')
+      return name
+    },
+    avatar(){
+      var avatar = localStorage.getItem('avatar')
+      return avatar
+    }
+  },
+  mounded(){
   },
   methods: {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
     async logout() {
-      await logout({ username: this.$store.state.user.name }).then(res => {
+      var name = localStorage.getItem('username')
+      await logout({ username: name }).then(res => {
         // eslint-disable-next-line eqeqeq
         if (res.code == 200) {
           this.$store.commit('user/RESET_STATE')
           this.$router.push({ path: '/login' })
+          localStorage.removeItem('username');
           this.$message({
             showClose: true,
             // eslint-disable-next-line no-undef
@@ -132,8 +145,12 @@ export default {
 
       .avatar-wrapper {
         margin-top: 5px;
+        display: flex;
+        align-items: center;
         position: relative;
-
+        >span{
+          margin-left: 10px;
+        }
         .user-avatar {
           cursor: pointer;
           width: 40px;

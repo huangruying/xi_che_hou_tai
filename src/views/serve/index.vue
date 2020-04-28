@@ -21,16 +21,16 @@
           <el-select v-model="queryList.orderStatus" @change="getData" class="input fl" placeholder="订单状态">
             <el-option
               v-for="item in indentStateList"
-              :label="item.id"
-              :value="item.name"
+              :label="item.name"
+              :value="item.id"
               :key="item.id"
             ></el-option>
           </el-select>
           <el-select v-model="queryList.orderSource" @change="getData" class="input fl" placeholder="订单来源">
             <el-option
               v-for="value in sourceList"
-              :label="value.id"
-              :value="value.name"
+              :label="value.name"
+              :value="value.id"
               :key="value.id"
             ></el-option>
           </el-select>
@@ -91,9 +91,9 @@
           <span>{{ scope.row.phone }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="订单状态" prop="orderStatus" align="center">
+      <el-table-column label="订单状态" prop="orderStatusCopy" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.orderStatus }}</span>
+          <span>{{ scope.row.orderStatusCopy }}</span>
         </template>
       </el-table-column>
       <el-table-column label="订单来源" prop="orderSource" align="center">
@@ -139,6 +139,66 @@
       :limit.sync="data.per_page"
       @pagination="getPageData"
     />
+    <!-- 查看 -->
+    <el-dialog
+      :title="dialogTitle"
+      :visible.sync="editDialog"
+      width="50%"
+      @close="close"
+      center>
+      <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
+           <!-- <span class="title">账号信息</span> -->
+           <el-form-item label="订单编号:" prop="orderCode" style="width:50%">
+              <el-input v-model="itemObj.orderCode" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label="车行名称:" prop="garageName" style="width:50%">
+              <el-input v-model="itemObj.garageName" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label="车行联系人:" prop="garageContacts" style="width:50%">
+              <el-input v-model="itemObj.garageContacts" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label="车行联系人电话:" prop="garagePhone" style="width:50%">
+              <el-input v-model="itemObj.garagePhone" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label="车行地址:" prop="garageAddress" style="width:50%">
+              <el-input v-model="itemObj.garageAddress" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label="品牌车系:" prop="brandCar" style="width:50%">
+              <el-input v-model="itemObj.brandCar" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label="车牌号:" prop="garageName" style="width:50%">
+              <el-input v-model="itemObj.garageName" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label=" 联系人:" prop="contacts" style="width:50%">
+              <el-input v-model="itemObj.contacts" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label=" 手机号:" prop="phone" style="width:50%">
+              <el-input v-model="itemObj.phone" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label=" 订单状态:" prop="orderStatusCopy" style="width:50%">
+              <el-input v-model="itemObj.orderStatusCopy" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label=" 订单来源:" prop="orderSource" style="width:50%">
+              <el-input v-model="itemObj.orderSource" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label=" 项目名称:" prop="projectName" style="width:50%">
+              <el-input v-model="itemObj.projectName" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label=" 应收金额:" prop="money" style="width:50%">
+              <el-input v-model="itemObj.money" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label=" 预约时间:" prop="appointmentTime" style="width:50%">
+              <el-input v-model="itemObj.appointmentTime" style="width:80%" disabled></el-input>
+           </el-form-item>
+           <el-form-item label=" 下单时间:" prop="placeTime" style="width:50%">
+              <el-input v-model="itemObj.placeTime" style="width:80%" disabled></el-input>
+           </el-form-item>
+       </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editDialog = false">取 消</el-button>
+        <el-button type="primary" :loading="loadingBootm" @click="editDialog = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -174,9 +234,7 @@ export default {
       loading: false,
       passDialog: false,
       editDialog: false,
-      itemObj: {
-        openingBank: false
-      },
+      itemObj: {},
       rules: {
           username: [
             { required: true, message: '不能为空', trigger: 'blur' },
@@ -216,13 +274,17 @@ export default {
       },
       indentStateList: [
         {
-          name: '哈哈',
+          name: '未支付',
           id: 0
+        },
+        {
+          name: '已支付',
+          id: 1
         }
       ],
       sourceList: [
         {
-          name: '娜娜',
+          name: '全部',
           id: 0
         }
       ],
@@ -251,17 +313,10 @@ export default {
             type: 'warning'
           })
       }else{
-        // row.exportDatabtn = false
-        dotExport({ pageNum: this.data.current_page,pageSize: this.data.per_page}).then(res => {
-          // console.log(res);
-          // this.$message({
-          //   message: '操作成功',
-          //   type: 'success'
-          // })
-          // this.down(`${this.thishostName}${res.url}`)
-
-          // row.exportDatabtn = false
-        })
+          var {licensePlate,phone,garageName,orderStatus,orderSource,time} = this.queryList
+          var startTime = time[0]
+          var endTime = time[1]
+          window.location.href = `http://192.168.0.161:8182/yuyuetrip/wash/serviceOrderExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}&licensePlate=${licensePlate}&phone=${phone}&garageName=${garageName}&orderStatus=${orderStatus}&orderSource=${orderSource}&startTime=${startTime}&endTime=${endTime}`
       }
     },
     getData(filter){
@@ -296,21 +351,34 @@ export default {
       data.pageNum = this.data.current_page
       data.pageSize = this.data.per_page
       findServiceOrderInfos(data).then(res=>{
-        console.log(res);
         // this.data = res;
         this.loading = false;
         if (!res.data || res.data.length <= 0) {
           this.$message("暂无数据~")
+          this.data.data = []
         }
         if( res.data && res.data.length > 0){
           this.data = res;
           this.data.current_page = res.pageNum
           this.data.per_page = res.pageSize
           this.data.total = res.total
-          // this.data.data.forEach(v=>{
-          // })
+          this.data.data.forEach(v=>{
+            if(v.orderStatus == 0){
+              v.orderStatusCopy = '未支付'
+            }else{
+              v.orderStatusCopy = '已支付'
+            }
+          })
         }
       })
+    },
+    compile(item){
+      this.dialogTitle = "查看"
+      this.itemObj = item
+      this.editDialog = true
+    },
+    close(){
+      this.itemObj = {}
     },
     handleFilter(){
       this.getData()
