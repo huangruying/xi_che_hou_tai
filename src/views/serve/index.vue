@@ -66,24 +66,24 @@
       fit
       style="width: 100%;">
       <!-- fit highlight-current-row -->
-      <el-table-column label="订单编号" prop="orderCode" fixed align="center">
+      <el-table-column label="订单编号" prop="orderNo" fixed align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.orderCode }}</span>
+          <span>{{ scope.row.orderNo }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="车行名称" prop="garageName" align="center">
+      <el-table-column label="车行名称" prop="dotName" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.garageName }}</span>
+          <span>{{ scope.row.dotName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="车牌号" prop="garageName" align="center">
+      <el-table-column label="车牌号" prop="licensePlate" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.garageName }}</span>
+          <span>{{ scope.row.licensePlate }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="联系人" prop="contacts" align="center">
+      <el-table-column label="联系人" prop="shopowner" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.contacts }}</span>
+          <span>{{ scope.row.shopowner }}</span>
         </template>
       </el-table-column>
       <el-table-column label="手机号" prop="phone" align="center">
@@ -121,6 +121,11 @@
           <span>{{ scope.row.placeTime }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="是否对账" prop="reconciliationCopy" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.reconciliationCopy }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="备注" prop="remarks" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.remarks }}</span>
@@ -128,6 +133,7 @@
       </el-table-column>
       <el-table-column label="操作" width="200" fixed="right" prop="audit_status" align="center">
         <template slot-scope="scope">
+          <el-button size="mini" type="success" @click="reconciliation(scope.row)" v-if="scope.row.reconciliation == 0? true : false">对账</el-button>
           <el-button size="mini" type="primary" @click="compile(scope.row)">查询</el-button>
         </template>
       </el-table-column>
@@ -148,29 +154,26 @@
       center>
       <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
            <!-- <span class="title">账号信息</span> -->
-           <el-form-item label="订单编号:" prop="orderCode" style="width:50%">
-              <el-input v-model="itemObj.orderCode" style="width:80%" disabled></el-input>
+           <el-form-item label="订单编号:" prop="orderNo" style="width:50%">
+              <el-input v-model="itemObj.orderNo" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label="车行名称:" prop="garageName" style="width:50%">
-              <el-input v-model="itemObj.garageName" style="width:80%" disabled></el-input>
+           <el-form-item label="车行名称:" prop="dotName" style="width:50%">
+              <el-input v-model="itemObj.dotName" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label="车行联系人:" prop="garageContacts" style="width:50%">
-              <el-input v-model="itemObj.garageContacts" style="width:80%" disabled></el-input>
+           <el-form-item label="车行联系人:" prop="shopowner" style="width:50%">
+              <el-input v-model="itemObj.shopowner" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label="车行联系人电话:" prop="garagePhone" style="width:50%">
-              <el-input v-model="itemObj.garagePhone" style="width:80%" disabled></el-input>
+           <el-form-item label="车行联系人电话:" prop="phone" style="width:50%">
+              <el-input v-model="itemObj.phone" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label="车行地址:" prop="garageAddress" style="width:50%">
-              <el-input v-model="itemObj.garageAddress" style="width:80%" disabled></el-input>
+           <el-form-item label="车行地址:" prop="address" style="width:50%">
+              <el-input v-model="itemObj.address" style="width:80%" disabled></el-input>
            </el-form-item>
-           <el-form-item label="品牌车系:" prop="brandCar" style="width:50%">
+           <!-- <el-form-item label="品牌车系:" prop="brandCar" style="width:50%">
               <el-input v-model="itemObj.brandCar" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label="车牌号:" prop="garageName" style="width:50%">
-              <el-input v-model="itemObj.garageName" style="width:80%" disabled></el-input>
-           </el-form-item>
-           <el-form-item label=" 联系人:" prop="contacts" style="width:50%">
-              <el-input v-model="itemObj.contacts" style="width:80%" disabled></el-input>
+           </el-form-item> -->
+           <el-form-item label="车牌号:" prop="licensePlate" style="width:50%">
+              <el-input v-model="itemObj.licensePlate" style="width:80%" disabled></el-input>
            </el-form-item>
            <el-form-item label=" 手机号:" prop="phone" style="width:50%">
               <el-input v-model="itemObj.phone" style="width:80%" disabled></el-input>
@@ -193,6 +196,9 @@
            <el-form-item label=" 下单时间:" prop="placeTime" style="width:50%">
               <el-input v-model="itemObj.placeTime" style="width:80%" disabled></el-input>
            </el-form-item>
+           <el-form-item label=" 是否对账:" prop="reconciliationCopy" style="width:50%">
+              <el-input v-model="itemObj.reconciliationCopy" style="width:80%" disabled></el-input>
+           </el-form-item>
        </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="editDialog = false">取 消</el-button>
@@ -203,7 +209,7 @@
 </template>
 
 <script>
-import { findServiceOrderInfos , } from '@/api/serve'
+import { findServiceOrderInfos , updateReconciliationByOrderNo } from '@/api/serve'
 import Pagination from "@/components/Pagination"
 export default {
   components: {
@@ -305,6 +311,36 @@ export default {
     this.thishostName = `${location.protocol}//${location.hostname}`
   },
   methods: {
+    reconciliation(item){
+       this.open(item.orderNo)
+    },
+    open(orderNo) {
+        this.$confirm('确定对账?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          updateReconciliationByOrderNo({orderNo}).then(res=>{
+            if(res.code == 200){
+              this.$message({
+                type: 'success',
+                message: '操作成功!'
+              });
+              this.getData()
+            }else{
+              this.$message({
+                type: 'info',
+                message: res.msg
+              })
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });          
+        });
+    },
     exportData(){
             // console.log(this.data.data);
       if(this.data.data.length <= 0){
@@ -316,7 +352,7 @@ export default {
           var {licensePlate,phone,garageName,orderStatus,orderSource,time} = this.queryList
           var startTime = time[0]
           var endTime = time[1]
-          window.location.href = `http://192.168.0.161:8182/yuyuetrip/wash/serviceOrderExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}&licensePlate=${licensePlate}&phone=${phone}&garageName=${garageName}&orderStatus=${orderStatus}&orderSource=${orderSource}&startTime=${startTime}&endTime=${endTime}`
+          window.location.href = `http://test2.yuyuetrip.com.cn/yuyuetrip/wash/serviceOrderExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}&licensePlate=${licensePlate}&phone=${phone}&dotName=${garageName}&orderStatus=${orderStatus}&orderSource=${orderSource}&startTime=${startTime}&endTime=${endTime}`
       }
     },
     getData(filter){
@@ -358,6 +394,7 @@ export default {
           this.data.data = []
         }
         if( res.data && res.data.length > 0){
+          console.log(res);
           this.data = res;
           this.data.current_page = res.pageNum
           this.data.per_page = res.pageSize
@@ -367,6 +404,11 @@ export default {
               v.orderStatusCopy = '未支付'
             }else{
               v.orderStatusCopy = '已支付'
+            }
+            if(v.reconciliation == 0){
+              v.reconciliationCopy = '未对账'
+            }else if(v.reconciliation == 1){
+              v.reconciliationCopy = '已对账'
             }
           })
         }

@@ -161,6 +161,20 @@ export const constantRoutes = [
     ]
   },
 
+  {
+    path: '/volume',
+    alwaysShow: true,
+    component: Layout,
+    meta: { title: '卷码管理', icon: 'example' },
+    children: [
+      {
+        path: 'volumeList',
+        name: 'volumeList',
+        component: () => import('@/views/volumeList/index'),
+        meta: { title: '卷码列表', icon: 'table' }
+      }
+    ]
+  },
   // {
   //   path: '/form',
   //   component: Layout,

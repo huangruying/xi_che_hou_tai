@@ -7,3 +7,11 @@ export function findServiceOrderInfos(data) {
     data
   })
 }
+
+export function updateReconciliationByOrderNo(data) {
+  return request({
+    url: '/wash/updateReconciliationByOrderNo',
+    method: 'post',
+    data: data
+  })
+}
