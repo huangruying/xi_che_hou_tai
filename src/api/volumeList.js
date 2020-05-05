@@ -19,7 +19,7 @@ export function findGeneralCoupon(data) {
 export function batchCouponImport(data) {
     return request({
       url: '/wash/batchCouponImport',
-      method: 'get',
-      params: data
+      method: 'post',
+      data: data
     })
 }

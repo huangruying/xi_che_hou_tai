@@ -94,12 +94,12 @@
           <span>{{ scope.row.alias }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="一级分类" prop="dotType" align="center">
+      <el-table-column label="卷码类型" prop="dotType" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.dotType }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="二级分类" prop="dotsType" align="center">
+      <el-table-column label="服务类型" prop="dotsType" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.dotsType }}</span>
         </template>
@@ -259,7 +259,8 @@ export default {
           var {couponName,couponCode,name,alias,status,time} = this.queryList
           var startTime = time[0]
           var endTime = time[1]
-          window.location.href = `http://192.168.0.160:8189/yuyuetrip/wash/generalCouponExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}&couponName=${couponName}&couponCode=${couponCode}&name=${name}&alias=${alias}&status=${status}&startTime=${startTime}&endTime=${endTime}`
+          window.location.href = `http://192.168.0.160:8189/yuyuetrip/wash/generalCouponExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}
+          &couponName=${couponName}&couponCode=${couponCode}&name=${name}&alias=${alias}&status=${status}&startTime=${startTime}&endTime=${endTime}`
       }
     },
     submitImportExcel() {
