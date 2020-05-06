@@ -23,3 +23,11 @@ export function batchCouponImport(data) {
       data: data
     })
 }
+
+export function findCompanyInfos(data) {
+  return request({
+    url: '/wash/findCompanyInfos',
+    method: 'post',
+    data: data
+  })
+}

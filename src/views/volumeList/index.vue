@@ -48,8 +48,8 @@
          <div>
            <el-button type="primary" icon="el-icon-search" @click="getData">搜索</el-button>
            <el-button type="primary" @click="reset">重置</el-button>
-           <el-button type="primary" @click="exportData">导出</el-button>
            <el-button type="primary" @click="importExcel">导入</el-button>
+           <el-button type="primary" @click="exportData">导出</el-button>
          </div>
          <div>
            <el-button type="primary" icon="el-icon-refresh" @click="resetGetData"></el-button>
@@ -140,6 +140,15 @@
 
     <!--上传文件的弹窗-->
     <el-dialog :visible.sync="uploaddialogVisible" title="导入数据">
+      <el-select v-model="facilitatorId" class="input fl" placeholder="导入请选择服务商">
+            <el-option
+              v-for="item in statusInfoList"
+              :label="item.name"
+              :value="item.id"
+              :key="item.value"
+            ></el-option>
+      </el-select>
+
       <el-upload ref="upload" :auto-upload="false" :multiple="false" :on-change="handleChange" :on-remove="removeFile"
         :limit="1" action="" drag class="upload-demo">
         <i class="el-icon-upload"></i>
@@ -155,7 +164,7 @@
 </template>
 
 <script>
-import { findGeneralCoupon , batchCouponImport } from '@/api/volumeList'
+import { findGeneralCoupon , batchCouponImport , findCompanyInfos } from '@/api/volumeList'
 import Pagination from "@/components/Pagination"
 export default {
   components: {
@@ -170,11 +179,12 @@ export default {
           if (!reg.test(value)) {
             callback(new Error('请输入正确的手机号！'));
           }else{
-            callback();
+            callback()
           } 
         }
     };
     return {
+      facilitatorId: null,
       dotCode: "",
       dialogTitle: "",
       thishostName: '',
@@ -242,13 +252,19 @@ export default {
           value: 2
         },
       ],
+      statusInfoList: []
     }
   },
   created() {
+    this.selectInfo()
     this.getData()
     this.thishostName = `${location.protocol}//${location.hostname}`
   },
   methods: {
+    async selectInfo(){
+      var res = await findCompanyInfos()
+      this.statusInfoList = res.data
+    },
     exportData(){
       if(this.data.data.length <= 0){
         this.$message({
@@ -259,16 +275,24 @@ export default {
           var {couponName,couponCode,name,alias,status,time} = this.queryList
           var startTime = time[0]
           var endTime = time[1]
-          window.location.href = `http://192.168.0.160:8189/yuyuetrip/wash/generalCouponExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}
+          window.location.href = `http://192.168.0.161:8189/yuyuetrip/wash/generalCouponExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}
           &couponName=${couponName}&couponCode=${couponCode}&name=${name}&alias=${alias}&status=${status}&startTime=${startTime}&endTime=${endTime}`
       }
     },
     submitImportExcel() {
+      if(!this.facilitatorId){
+        this.$message({
+          type: "warning",
+          message: "请选择服务商"
+        })
+      }else{
         if (this.fileList) {
           this.uploaddialogVisible = false
           var formData = new FormData()
           formData.append('file', this.fileList[0].raw)
+          formData.append('id', this.facilitatorId)
           batchCouponImport(formData).then(res => {
+            console.log(res);
             this.getData()
             this.$message({
               type: 'success',
@@ -280,6 +304,7 @@ export default {
             message: '请选择Excle文件!'
           })
         }
+      }
     },
     importExcel() {
         this.fileList = null
