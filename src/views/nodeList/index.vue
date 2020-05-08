@@ -144,7 +144,7 @@
       </el-table-column>
       <el-table-column label="操作" width="230" fixed="right" prop="audit_status" align="center">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="pass(scope.row)">审批</el-button>
+          <el-button size="mini" type="primary" @click="pass(scope.row)" v-if="scope.row.status != 1">审批</el-button>
           <el-button size="mini" type="primary" @click="edit(scope.row)">查看</el-button>
           <el-button size="mini" type="primary" @click="compile(scope.row)">编辑</el-button>
         </template>
@@ -189,6 +189,7 @@
         title="选择经纬度"
         :visible.sync="lngLatDialog"
         @opened="lnglatlog"
+        @close="close2"
         append-to-body>
 
         <div class="mymapM">
@@ -292,13 +293,13 @@
             <el-form-item label="救援电话:" prop="rescueCall" style="width:50%">
               <el-input v-model="itemObj.rescueCall" style="width:210px" :disabled="alterDisabled"></el-input>
             </el-form-item>
-            <el-form-item label="负责人:" prop="charge" style="width:50%">
+            <!-- <el-form-item label="负责人:" prop="charge" style="width:50%">
               <el-input v-model="itemObj.charge" style="width:210px" :disabled="inputDisabled"></el-input>
             </el-form-item>
             <el-form-item label="负责人手机号码:" prop="chargePhone" style="width:50%">
               <el-input v-model="itemObj.chargePhone" style="width:210px" :disabled="inputDisabled"></el-input>
-            </el-form-item>
-            <el-form-item label="合同到期时间:" prop="contractTime" style="width:50%">
+            </el-form-item> -->
+            <el-form-item label="合同到期时间:" prop="contractTime" style="width:50%" required>
               <el-date-picker
                 format="yyyy 年 MM 月 dd 日"
                 value-format="yyyy-MM-dd"
@@ -308,21 +309,15 @@
                 style="width:210px"
                 placeholder="选择日期时间">
               </el-date-picker>
-              <!-- <el-input v-model="itemObj.contractTime" style="width:210px" :disabled="alterDisabled"></el-input> -->
             </el-form-item>
-            <el-form-item label="经度/纬度:" prop="longitude" style="width:50%">
+            <el-form-item label="经度/纬度:" prop="longitude" style="width:50%" class="formspan" :class="!lanbtn?'itembor': ''">
               <!-- <div>
                 <span class="lnglatText" @click="lngLatDia">{{lnglatText}}</span>
               </div> -->
-              <el-input v-model="itemObj.longitude" style="width:210px" @click="lngLatDia" placeholder="" disabled></el-input>
+              <el-input v-model="itemObj.longitude" style="width:210px;" @click="lngLatDia" placeholder="请点击右侧按钮选择经纬度"></el-input>
               <el-button type="primary" @click="lngLatDia" :disabled="inputDisabled">点击选择经纬度</el-button>
+              <span style="color: #f00;" class="spanbtn" v-if="!lanbtn">请点击按钮选择经纬度</span>
             </el-form-item>
-            <!-- <el-form-item label="经度:" prop="longitude" style="width:50%">
-              <el-input v-model="itemObj.longitude" style="width:210px" :disabled="inputDisabled"></el-input>
-            </el-form-item>
-            <el-form-item label="纬度:" prop="latitude" style="width:50%">
-              <el-input v-model="itemObj.latitude" style="width:210px" :disabled="inputDisabled"></el-input>
-            </el-form-item> -->
             <el-form-item label="网点推荐人:" prop="recommender" style="width:50%">
               <el-input v-model="itemObj.recommender" style="width:210px" :disabled="inputDisabled"></el-input>
             </el-form-item>
@@ -342,12 +337,8 @@
               end-placeholder="结束时间"
               placeholder="选择时间范围">
             </el-time-picker>
-              <!-- <el-input v-model="itemObj.businessHours" style="width:210px" :disabled="alterDisabled"></el-input> -->
             </el-form-item>
             <el-form-item label="省:" prop="province" style="width:50%">
-              <!-- <el-select v-model="itemObj.province" placeholder="请选择省份" @change="changeCity">
-                <el-option v-for="(item, idx) in areaJson" :key="idx" :label="item.n" :value="item.n"></el-option>
-              </el-select> -->
               <el-select v-model="itemObj.province" placeholder="请选择省份" @change="changeCity" :disabled="alterDisabled">
                 <el-option v-for="(item, idx) in areaJson" :key="idx" :label="item.province" :value="item.province"></el-option>
               </el-select>
@@ -356,20 +347,13 @@
               <el-select v-model="itemObj.city" placeholder="请选择城市" @change="changeCounty" :disabled="alterDisabled">
                 <el-option v-for="(item, idx) in cityList" :key="idx" :label="item.city" :value="item.cityid"></el-option>
               </el-select>
-              <!-- <el-select v-model="itemObj.city" placeholder="请选择城市" @change="changeCounty">
-                <el-option v-for="(item, idx) in cityList" :key="idx" :label="item.n" :value="item.n"></el-option>
-              </el-select> -->
             </el-form-item>
             <el-form-item label="区:" prop="region" style="width:50%">
               <el-select v-model="itemObj.regionId" placeholder="请选择区/县" :disabled="alterDisabled">
                 <el-option v-for="(item, idx) in countyList" :key="idx" :label="item.area" :value="item.areaid"></el-option>
               </el-select>
-              <!-- <el-select v-model="itemObj.region" placeholder="请选择区/县">
-                <el-option v-for="(item, idx) in countyList" :key="idx" :label="item.n" :value="item.n"></el-option>
-              </el-select> -->
-              <!-- <el-input v-model="itemObj.region" style="width:210px" :disabled="alterDisabled"></el-input> -->
             </el-form-item>
-            <el-form-item label="门店商城地址:" prop="address" style="width:100%">
+            <el-form-item label="网点详细地址:" prop="address" style="width:100%">
               <el-input v-model="itemObj.address" style="width:80%;" :disabled="inputDisabled"></el-input>
             </el-form-item>      
          </div>
@@ -537,6 +521,7 @@ export default {
     return {
       center: [116.42792, 39.902896], //经度+纬度
       search_key: "", //搜索值
+      lanbtn: true,
       lists: [], //地点列表
       search_list: [], //搜索结果列表
       marker: "",
@@ -570,7 +555,7 @@ export default {
       countyList: [],
       rules: {
           dotCode: [
-            { required: true, message: '不能为空', trigger: 'blur' },
+            { required: true, message: '网点编号不能为空', trigger: 'blur' },
             // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
           ],
           region: [
@@ -586,12 +571,35 @@ export default {
             { required: true, message: '请选择网点类型', trigger: 'change' }
           ],
           dotName: [
-            { required: true, message: '不能为空', trigger: 'blur' },
-            // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+            { required: true, message: '网点名称不能为空', trigger: 'blur' }
           ],
           date: [
              { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
           ],
+          dotAbbreviation: [
+            { required: true, message: '网点简称不能为空', trigger: 'blur' }
+          ],
+          shopowner: [
+            { required: true, message: '经理/店长姓名不能为空', trigger: 'blur' }
+          ],
+          storePhone: [
+            { required: true, message: '经理/店长手机号码不能为空', trigger: 'blur' }
+          ],
+          dotAddress: [
+            { required: true, message: '网点地址不能为空', trigger: 'blur' }
+          ],
+          recommender: [
+            { required: true, message: '网点推荐人不能为空', trigger: 'blur' }
+          ],
+          longitude: [
+            { required: true, message: '请选择经纬度', trigger: 'input'}
+          ],
+          contractTime: [
+            { required: true, message: '请选择合同到期时间', trigger: 'blur'}
+          ],
+          businessHours: [
+            { required: true, message: '请选择营业时间', trigger: 'blur'}
+          ]
           // storePhone: [
           //   { required: true, message: '不能为空', trigger: 'blur' },
           //   { validator: storePhone, trigger: 'blur' }
@@ -769,6 +777,7 @@ export default {
       var arr = [e.location.lng , e.location.lat]
       this.arrLngLat = arr
       this.itemObj.longitude = arr[0] + "/" + arr[1]
+      this.itemObj.longitudes = arr[0] + "/" + arr[1]
       this.lngLatDialog = false
     },
     onSearchLi(e) {
@@ -791,6 +800,7 @@ export default {
     // },
     lngLatDia(){
       this.lngLatDialog = true
+      // this.inputBtn = false
       //初始化地图
       // this.$nextTick(()=>{
       // })
@@ -827,7 +837,7 @@ export default {
       if (queryList.region) {
         data.region = queryList.region
       }
-      if (queryList.chargePhone   ) {
+      if (queryList.chargePhone) {
         data.chargePhone = queryList.chargePhone   
       }
       if (queryList.recommender) {
@@ -917,12 +927,25 @@ export default {
       this.urlBl = val
       this.apiFindMechanismName()
     },
+    close2(){
+        // this.inputBtn = true
+    },
     editDialogVisible(){
       // 使用ES6的Object.keys()方法,是ES6的新方法, 返回值也是对象中属性名组成的数组
       // var data = this.itemObj
       // var arr = Object.keys(data);
       this.$refs['ruleForm'].validate((valid) => {
           if (valid) {
+            if(!(this.arrLngLat[0] && this.arrLngLat[1])){
+              this.$message({
+                    message: '经纬度格式不正确，请点击按钮选择经纬度',
+                    type: 'warning'
+                  })
+              this.lanbtn = false
+              return
+            }else{
+              this.lanbtn = true
+            }
             // this.loadingBootm = true
             this.itemObj.longitude = this.arrLngLat[0]
             this.itemObj.latitude = this.arrLngLat[1]
@@ -994,7 +1017,7 @@ export default {
       var {dotCode,status,dotName,province,city,region,phone,nodeTypes,recommender,time} = this.queryList
         var startTime = time[0]
         var endTime = time[1]
-        window.location.href = `http://192.168.0.161:8189/yuyuetrip/wash/dotExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}&status=${status}&dotCode=${dotCode}&dotName=${dotName}&province=${province}&city=${city}&region=${region}&phone=${phone}&nodeTypes=${nodeTypes}&recommender=${recommender}&startTime=${startTime}&endTime=${endTime}`
+        window.location.href = `http://test2.yuyuetrip.com.cn/wash/dotExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}&status=${status}&dotCode=${dotCode}&dotName=${dotName}&province=${province}&city=${city}&region=${region}&phone=${phone}&nodeTypes=${nodeTypes}&recommender=${recommender}&startTime=${startTime}&endTime=${endTime}`
         // row.exportDatabtn = false
         // dotExport({ pageNum: this.data.current_page , pageSize: this.data.per_page}).then(res => {
         //   console.log(res);
@@ -1373,7 +1396,20 @@ export default {
 </style>
 
 <style lang="less" scoped>
-
+.itembor{
+  /deep/.el-input__inner{
+    border-color: #F56C6C;
+  }
+}
+.formspan{
+  position: relative;
+  .spanbtn{
+    position: absolute;
+    top: 28px;
+    left: 0;
+    z-index: 100;
+  }
+}
 .title{
   font-size: 18px;
   font-weight: 600;

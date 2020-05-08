@@ -430,14 +430,11 @@ export default {
     },
     reset(){
       this.queryList = {
-        dotCode: null,
-        status: null,
-        dotName: null,
-        province: null,
-        city: null,
-        region: null,
+        licensePlate: null,
         phone: null,
-        recommender: null,
+        garageName: null,
+        orderStatus: null,
+        orderSource: null,
         time: ["", ""],
       }
     },

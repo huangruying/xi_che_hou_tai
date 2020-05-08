@@ -24,30 +24,28 @@
           class="input fl"
           @keyup.enter.native="handleFilter"/>
           <el-input
-          v-model="queryList.phone"
-          placeholder="请输入手机号"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-          <el-input
-          v-model="queryList.licensePlate"
-          placeholder="请输入车牌号"
-          class="input fl"
-          @keyup.enter.native="handleFilter"/>
-          <el-input
           v-model="queryList.province"
-          placeholder="请输入省份"
+          placeholder="请输入所属省"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
           <el-input
           v-model="queryList.city"
-          placeholder="请输入市"
+          placeholder="请输入所属市"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
           <el-input
           v-model="queryList.region"
-          placeholder="请输入区"
+          placeholder="请输入所属区"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
+          <el-select v-model="queryList.reconciliation" @change="getData" class="input fl" placeholder="是否对账">
+            <el-option
+              v-for="item in statusList"
+              :label="item.name"
+              :value="item.value"
+              :key="item.value"
+            ></el-option>
+          </el-select>
           <el-date-picker
             class="input fl"
             style="width:260px"
@@ -90,34 +88,9 @@
           <span>{{ scope.row.couponCode }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="网点名称" prop="dotName" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.dotName }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="服务商" prop="companyName" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.companyName }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="金额" prop="couponMoney" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.couponMoney }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="手机号" prop="phone" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.phone }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="车牌号" prop="licensePlate" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.licensePlate }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="核销时间" prop="destructionTime" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.destructionTime }}</span>
         </template>
       </el-table-column>
       <el-table-column label="所属省" prop="province" align="center">
@@ -125,26 +98,46 @@
           <span>{{ scope.row.province }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="所属市" prop="city" align="center">
+      <el-table-column label="所在市" prop="city" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.city }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="所属区" prop="region" align="center">
+      <el-table-column label="区域" prop="region" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.region }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="详细地址" prop="dotAddress" align="center">
+      <el-table-column label="网点名称" prop="dotName" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.dotAddress }}</span>
+          <span>{{ scope.row.dotName }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="操作" width="200" fixed="right" prop="audit_status" align="center">
+      <el-table-column label="金额" prop="couponMoney" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.couponMoney }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="创建时间" prop="createTime" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.createTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="是否导出" prop="insuranceExport" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.insuranceExport == 0 ? "未导出" : "已导出"}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="是否对账" prop="reconciliation" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.reconciliation == 0 ? "未对账" : "已对账"}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="200" fixed="right" prop="audit_status" align="center">
         <template slot-scope="scope">
           <el-button size="mini" type="primary" @click="compile(scope.row)" v-if="scope.row.reconciliation==0">修改对账</el-button>
         </template>
-      </el-table-column> -->
+      </el-table-column>
     </el-table>
     <pagination
       v-show="data.total>0"
@@ -157,7 +150,7 @@
 </template>
 
 <script>
-import { findWriteoffOrderHx } from '@/api/audit'
+import { findInsuranceWriteoffOrder , updateReconciliation } from '@/api/insuranceReconciliation'
 import Pagination from "@/components/Pagination"
 export default {
   components: {
@@ -204,13 +197,22 @@ export default {
         couponCode: null,
         companyName: null,
         dotName: null,
-        phone: null,
-        licensePlate: null,
         province: null,
         city: null,
         region: null,
+        reconciliation: null,
         time: ["", ""],
-      }
+      },
+      statusList: [
+        {
+          name: '未对账',
+          value: 0
+        },
+        {
+          name: '已对账',
+          value: 1
+        },
+      ],
     }
   },
   created() {
@@ -225,12 +227,11 @@ export default {
             type: 'warning'
           })
       }else{
-          var {orderNo,couponCode,companyName,dotName,phone,licensePlate,time} = this.queryList
+          var {orderNo,couponCode,companyName,dotName,province,city,region,reconciliation,time} = this.queryList
           var startTime = time[0]
           var endTime = time[1]
-          // console.log(orderNo,couponCode,companyName,dotName,phone,licensePlate,startTime,endTime);
-          window.location.href = `http://test2.yuyuetrip.com.cn/wash/writeoffOrderHxExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}
-          &orderNo=${orderNo}&couponCode=${couponCode}&companyName=${companyName}&dotName=${dotName}&phone=${phone}&licensePlate=${licensePlate}&startTime=${startTime}&endTime=${endTime}`
+          window.location.href = `http://test2.yuyuetrip.com.cn/wash/insuranceWriteoffOrderExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}
+          &orderNo=${orderNo}&couponCode=${couponCode}&companyName=${companyName}&dotName=${dotName}&province=${province}&city=${city}&region=${region}&reconciliation=${reconciliation}&startTime=${startTime}&endTime=${endTime}`
       }
     },
     getData(filter){
@@ -249,12 +250,6 @@ export default {
       if (queryList.dotName) {
         data.dotName = queryList.dotName   
       }
-      if (queryList.phone) {
-        data.phone = queryList.phone   
-      }
-      if (queryList.licensePlate) {
-        data.licensePlate = queryList.licensePlate   
-      }
       if (queryList.province) {
         data.province = queryList.province   
       }
@@ -263,6 +258,9 @@ export default {
       }
       if (queryList.region) {
         data.region = queryList.region   
+      }
+      if(!(queryList.reconciliation == null)){
+        data.reconciliation = queryList.reconciliation
       }
       if (queryList.time[0] && queryList.time[1]) {
         data.startTime = queryList.time[0]
@@ -273,9 +271,10 @@ export default {
       } else {
         this.data.current_page = 1;
       }
+      // data.username = this.$store.state.user.name
       data.pageNum = this.data.current_page
       data.pageSize = this.data.per_page
-      findWriteoffOrderHx(data).then(res=>{
+      findInsuranceWriteoffOrder(data).then(res=>{
         // console.log(res);
         this.data = res;
         this.loading = false;
@@ -305,17 +304,46 @@ export default {
     getPageData(e) {
       this.getData("page");
     },
+    compile(item){
+      this.open(item.orderNo)
+    },
+    open(orderNo) {
+        this.$confirm('是否修改为已对账?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          updateReconciliation({orderNo}).then(res=>{
+            if(res.code == 200){
+              this.$message({
+                  type: 'success',
+                  message: '操作成功!'
+                })
+              this.getData()
+            }else{
+              this.$message({
+                type: 'info',
+                message: res.msg
+              });
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '您已取消'
+          });          
+        })
+    },
     reset(){
       this.queryList = {
         orderNo: null,
         couponCode: null,
         companyName: null,
         dotName: null,
-        phone: null,
-        licensePlate: null,
         province: null,
         city: null,
         region: null,
+        reconciliation: null,
         time: ["", ""],
       }
     },

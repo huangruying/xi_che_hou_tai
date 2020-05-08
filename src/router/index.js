@@ -165,13 +165,33 @@ export const constantRoutes = [
     path: '/volume',
     alwaysShow: true,
     component: Layout,
-    meta: { title: '卷码管理', icon: 'example' },
+    meta: { title: '劵码管理', icon: 'example' },
     children: [
       {
         path: 'volumeList',
         name: 'volumeList',
         component: () => import('@/views/volumeList/index'),
-        meta: { title: '卷码列表', icon: 'table' }
+        meta: { title: '劵码列表', icon: 'table' }
+      }
+    ]
+  },
+
+  {
+    path: '/reconciliation',
+    component: Layout,
+    meta: { title: '对账管理', icon: 'example' },
+    children: [
+      {
+        path: 'nodeReconciliation',
+        name: 'nodeReconciliation',
+        component: () => import('@/views/nodeReconciliation/index'),
+        meta: { title: '网点对账', icon: 'table' }
+      },
+      {
+        path: 'insuranceReconciliation',
+        name: 'insuranceReconciliation',
+        component: () => import('@/views/insuranceReconciliation/index'),
+        meta: { title: '保险公司对账', icon: 'table' }
       }
     ]
   },

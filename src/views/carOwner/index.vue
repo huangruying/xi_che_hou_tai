@@ -236,14 +236,9 @@ export default {
     },
     reset(){
       this.queryList = {
-        dotCode: null,
-        status: null,
-        dotName: null,
-        province: null,
-        city: null,
-        region: null,
+        id: null,
         phone: null,
-        recommender: null,
+        username: null,
         time: ["", ""],
       }
     },

@@ -73,7 +73,7 @@ export function findCarwashTypeInfos(data) {
 
 export function findYuyueProvinces(params) {
   return request({
-    url: '/areas/findYuyueProvinces',
+    url: '/wash/findYuyueProvinces',
     method: 'get',
     params
   })
@@ -81,7 +81,7 @@ export function findYuyueProvinces(params) {
 
 export function findYuyueCityByProvinceid(params) {
   return request({
-    url: '/areas/findYuyueCityByProvinceid',
+    url: '/wash/findYuyueCityByProvinceid',
     method: 'get',
     params
   })
@@ -89,7 +89,7 @@ export function findYuyueCityByProvinceid(params) {
 
 export function findYuyueAreasByCityid(params) {
   return request({
-    url: '/areas/findYuyueAreasByCityid',
+    url: '/wash/findYuyueAreasByCityid',
     method: 'get',
     params
   })

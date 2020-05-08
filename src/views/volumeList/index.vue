@@ -23,7 +23,7 @@
           placeholder="请输入别名"
           class="input fl"
           @keyup.enter.native="handleFilter"/>
-          <el-select v-model="queryList.status" @change="getData" class="input fl" placeholder="状态">
+          <el-select v-model="queryList.status" @change="getList" class="input fl" placeholder="状态">
             <el-option
               v-for="item in statusList"
               :label="item.name"
@@ -275,7 +275,7 @@ export default {
           var {couponName,couponCode,name,alias,status,time} = this.queryList
           var startTime = time[0]
           var endTime = time[1]
-          window.location.href = `http://192.168.0.161:8189/yuyuetrip/wash/generalCouponExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}
+          window.location.href = `http://test2.yuyuetrip.com.cn/wash/generalCouponExport?pageNum=${this.data.current_page}&pageSize=${this.data.per_page}
           &couponName=${couponName}&couponCode=${couponCode}&name=${name}&alias=${alias}&status=${status}&startTime=${startTime}&endTime=${endTime}`
       }
     },
@@ -322,6 +322,9 @@ export default {
     handleChange(file, fileList) {
         this.fileList = fileList
     },
+    getList(data){
+      this.getData()
+    },
     getData(filter){
       this.loading = true
       let data = {}
@@ -338,8 +341,10 @@ export default {
       if (queryList.alias) {
         data.alias = queryList.alias   
       }
-      if (queryList.status) {
-        data.status = queryList.status   
+      // console.log(queryList.status);
+      if(queryList.status == null){
+      }else{
+        data.status = queryList.status
       }
       if (queryList.time[0] && queryList.time[1]) {
         data.startTime = queryList.time[0]
@@ -354,13 +359,20 @@ export default {
       data.pageNum = this.data.current_page
       data.pageSize = this.data.per_page
       findGeneralCoupon(data).then(res=>{
-        // console.log(res);
         this.data = res;
         this.loading = false;
-        if (res.data.length <= 0) {
+        if (res.msg == "暂无数据") {
           this.$message("暂无数据~")
+          this.data = {
+              current_page: 1,
+              data: [],
+              last_page: 1,
+              per_page: 10,
+              total: 0,
+              link: ""
+            }
         }
-        if( res.data.length > 0){
+        if(res.data && res.data.length > 0){
           this.data.current_page = res.pageNum
           this.data.per_page = res.pageSize
           this.data.total = res.total
@@ -377,14 +389,11 @@ export default {
     },
     reset(){
       this.queryList = {
-        dotCode: null,
+        couponName: null,
+        couponCode: null,
+        name: null,
+        alias: null,
         status: null,
-        dotName: null,
-        province: null,
-        city: null,
-        region: null,
-        phone: null,
-        recommender: null,
         time: ["", ""],
       }
     },
