@@ -247,7 +247,10 @@
         </div>
 
       </el-dialog>
-
+      <!-- 图片查看弹出窗 -->
+      <el-dialog :visible.sync="updateDialog" append-to-body>
+        <img width="100%" :src="dialogImageUrl" alt="">
+      </el-dialog>
       <el-form label-position="right" ref="ruleForm" :rules="rules" label-width="150px" :model="itemObj" class="clearFix">
        <el-divider content-position="left"><span class="title">网点信息</span></el-divider>
         <div class="query clearFix" style="padding-top:30px;margin-bottom:30px;">        
@@ -371,8 +374,27 @@
          </div>
          <el-divider content-position="left"><span class="title">网点照片及营业执照</span></el-divider>
          <div class="query clearFix" style="padding-top:30px;">
+           <div class="boxUpload">
+             <div class="item">
+                <el-upload
+                  :on-exceed="onExceed"
+                  :limit="4"
+                  action=""
+                  class="avatar-uploader"
+                  list-type="picture-card"
+                  :before-remove="handleRemove1"
+                  :on-preview="handlePictureCardPreview"
+                  :auto-upload="false"
+                  :on-change="handleChange1"
+                  :file-list="fileList_1"
+                  :before-upload="beforeAvatarUpload">
+                  <i class="el-icon-plus"></i>
+                </el-upload>
+                <div class="text">上传店面形象照片</div>
+             </div>
+           </div>
            <div class="boxUpload clearfix">
-            <div class="textUp">
+            <!-- <div class="textUp">
               <el-upload
                 :disabled="disabledBtn"
                 class="avatar-uploader"
@@ -382,13 +404,13 @@
                 :on-change="handleChange1"
                 :file-list="fileList_1"
                 :before-upload="beforeAvatarUpload">
-                <img v-if="itemObj.storeImage" :src="itemObj.storeImage" class="avatar">
+                <img v-if="storeImagess" :src="storeImagess" class="avatar">
                 <i v-else class="el-icon-plus avatar-uploader-icon">上传店面形象照片</i>
                 <div class="text">上传店面形象照片</div>
                 <el-button size="mini" type="primary" plain class="btn">+上传</el-button>
               </el-upload>
-              <a :href="itemObj.storeImage" target="_blank" class="uploadTransparency"></a>
-            </div>
+              <a :href="storeImagess" target="_blank" class="uploadTransparency" v-if="!(storeImagess=='')"></a>
+            </div> -->
             <div class="textUp">
               <el-upload
                 :disabled="disabledBtn"
@@ -399,12 +421,12 @@
                 :on-change="handleChange2"
                 :file-list="fileList_2"
                 :before-upload="beforeAvatarUpload">
-                <img v-if="itemObj.receptionImage" :src="itemObj.receptionImage" class="avatar">
+                <img v-if="receptionImage" :src="receptionImage" class="avatar">
                 <i v-else class="el-icon-plus avatar-uploader-icon">上传接待室照片</i>
                 <div class="text">上传接待室照片</div>
                 <el-button size="mini" type="primary" plain class="btn">+上传</el-button>
               </el-upload>
-              <a :href="itemObj.receptionImage" target="_blank" class="uploadTransparency"></a>
+              <a :href="receptionImage" target="_blank" class="uploadTransparency" v-if="!(receptionImage=='')"></a>
             </div>
             <div class="textUp">
               <el-upload
@@ -416,12 +438,12 @@
                 :on-change="handleChange5"
                 :file-list="fileList_5"
                 :before-upload="beforeAvatarUpload">
-                <img v-if="itemObj.honorImage" :src="itemObj.honorImage" class="avatar">
+                <img v-if="honorImage" :src="honorImage" class="avatar">
                 <i v-else class="el-icon-plus avatar-uploader-icon">上传其他荣誉照片</i>
                 <div class="text">上传其他荣誉照片</div>
                 <el-button size="mini" type="primary" plain class="btn">+上传</el-button>
               </el-upload>
-              <a :href="itemObj.honorImage" target="_blank" class="uploadTransparency"></a>
+              <a :href="honorImage" target="_blank" class="uploadTransparency" v-if="!(honorImage=='')"></a>
             </div>
             <div class="textUp">
               <el-upload
@@ -433,12 +455,12 @@
                 :on-change="handleChange3"
                 :file-list="fileList_3"
                 :before-upload="beforeAvatarUpload">
-                <img v-if="itemObj.constructionImage" :src="itemObj.constructionImage" class="avatar">
+                <img v-if="constructionImage" :src="constructionImage" class="avatar">
                 <i v-else class="el-icon-plus avatar-uploader-icon">上传施工车间照片</i>
                 <div class="text">上传施工车间照片</div>
                 <el-button size="mini" type="primary" plain class="btn">+上传</el-button>
               </el-upload>
-              <a :href="itemObj.constructionImage" target="_blank" class="uploadTransparency"></a>
+              <a :href="constructionImage" target="_blank" class="uploadTransparency" v-if="!(constructionImage=='')"></a>
             </div>
             <div class="textUp">
               <el-upload
@@ -450,12 +472,12 @@
                 :on-change="handleChange4"
                 :file-list="fileList_4"
                 :before-upload="beforeAvatarUpload">
-                <img v-if="itemObj.trafficImage" :src="itemObj.trafficImage" class="avatar">
+                <img v-if="trafficImage" :src="trafficImage" class="avatar">
                 <i v-else class="el-icon-plus avatar-uploader-icon">上传交通许可证</i>
                 <div class="text">上传交通许可证</div>
                 <el-button size="mini" type="primary" plain class="btn">+上传</el-button>
               </el-upload>
-              <a :href="itemObj.trafficImage" target="_blank" class="uploadTransparency"></a>
+              <a :href="trafficImage" target="_blank" class="uploadTransparency" v-if="!(trafficImage=='')"></a>
             </div>
             <div class="textUp">
               <el-upload
@@ -467,14 +489,15 @@
                 :on-change="handleChange6"
                 :file-list="fileList_6"
                 :before-upload="beforeAvatarUpload">
-                <img v-if="itemObj.businessImage" :src="itemObj.businessImage" class="avatar">
+                <img v-if="businessImage" :src="businessImage" class="avatar">
                 <i v-else class="el-icon-plus avatar-uploader-icon">上传工商营业照片</i>
                 <div class="text">上传工商营业照片</div>
                 <el-button size="mini" type="primary" plain class="btn">+上传</el-button>
               </el-upload>
-              <a :href="itemObj.businessImage" target="_blank" class="uploadTransparency"></a>
+              <a :href="businessImage" target="_blank" class="uploadTransparency" v-if="!(businessImage=='')"></a>
             </div>
           </div>
+          <!-- <div>店面形象照片最多上传4张，展示于用户界面轮播图。</div> -->
          </div>
        </el-form>
       <span slot="footer" class="dialog-footer">
@@ -532,6 +555,7 @@ export default {
       dotCode: "",
       dialogTitle: "",
       thishostName: '',
+      dialogImageUrl: "",
       loadingBootm: false,
       lngLatDialog: false,
       urlBl: false,
@@ -543,8 +567,16 @@ export default {
       loading: false,
       passDialog: false,
       editDialog: false,
+      updateDialog: false,
       areaJson: [],
       itemObj: {},
+      storeImage: [],
+      storeImagess: "",
+      receptionImage: "",
+      honorImage: "",
+      constructionImage: "",
+      trafficImage: "",
+      businessImage: "",
       fileList_1:[],
       fileList_2:[],
       fileList_3:[],
@@ -627,7 +659,7 @@ export default {
         phone: null,
         nodeTypes: null,
         recommender: null,
-        time: ["", ""],
+        time: ["" , ""]
       },
       statusList: [
         {
@@ -931,6 +963,8 @@ export default {
         // this.inputBtn = true
     },
     editDialogVisible(){
+      this.itemObj.storeImage = JSON.stringify(this.storeImage)
+      console.log(this.itemObj);
       // 使用ES6的Object.keys()方法,是ES6的新方法, 返回值也是对象中属性名组成的数组
       // var data = this.itemObj
       // var arr = Object.keys(data);
@@ -949,6 +983,7 @@ export default {
             // this.loadingBootm = true
             this.itemObj.longitude = this.arrLngLat[0]
             this.itemObj.latitude = this.arrLngLat[1]
+            this.itemObj.businessHours = JSON.stringify(this.itemObj.businessHours)
             if(this.urlBl){
               saveDot(this.itemObj).then(res=>{
                 // this.loadingBootm = false
@@ -1127,25 +1162,72 @@ export default {
         //   return 'success-row';
         // }
     },
-    apiUploadImg(formData){
+    onExceed(){
+      this.$message({
+          type: 'info',
+          message: "最多上传4张图片！"
+       })
+    },
+    apiUploadImg(formData , num){
       dotOssUpload(formData).then(res => {
-              this.$message({
+        console.log(res);
+            if(res.code == 200){
+               this.$message({
                 type: 'success',
                 message: `上传成功!`
               })
-              console.log(res);
-            })
+              if(num === 1){
+                this.storeImage.push(res.data)
+                // this.itemObj.storeImage = JSON.stringify(this.storeImage)
+              }else if(num === 2){
+                var arr = [res.data]
+                this.itemObj.receptionImage = JSON.stringify(arr)
+              }else if(num === 3){
+                var arr = [res.data]
+                this.itemObj.constructionImage = JSON.stringify(arr)
+              }else if(num === 4){
+                this.itemObj.trafficImage = JSON.stringify([res.data])
+              }else if(num === 5){
+                this.itemObj.honorImage = JSON.stringify([res.data])
+              }else if(num === 6){
+                this.itemObj.businessImage = JSON.stringify([res.data])
+              }
+            }else{
+              this.$message({
+                type: 'info',
+                message: res.msg
+              })
+            }
+      })
+    },
+    handlePictureCardPreview(file) {
+        this.dialogImageUrl = file.url;
+        this.updateDialog = true;
+    },
+   handleRemove1(file, fileList){
+        let a = file
+        let b = this.fileList_1.indexOf(a)
+        if(this.storeImage[b] == undefined){
+          this.$message({ message: '删除失败！' })
+          return Promise.reject()
+        }else{
+          this.storeImage.splice(b,1)
+          this.$message({ message: '已删除该照片!' })
+          return true
+        }
     },
     handleChange1(file, fileList) {
       if(fileList.length>0){
-         this.fileList_1 = [fileList[fileList.length - 1]] //展示最后一次选择文件
-         this.itemObj.storeImage = URL.createObjectURL(file.raw);
+        // this.fileList_1 = [fileList[fileList.length - 1]] //展示最后一次选择文件
+         this.fileList_1 = fileList
+         this.storeImagess = URL.createObjectURL(file.raw);
       }
       if (this.fileList_1) {
             var formData = new FormData()
           // formData.append('dotCode', this.dotCode)
-            formData.append('file', this.fileList_1[0].raw)
-           this.apiUploadImg(formData)
+            // formData.append('file', this.fileList_1[0].raw)
+            formData.append('file', file.raw)
+           this.apiUploadImg(formData , 1)
           } else {
             this.$message({ message: '请上传图片!' })
       }
@@ -1153,12 +1235,12 @@ export default {
     handleChange2(file, fileList) {
       if(fileList.length>0){
          this.fileList_2 = [fileList[fileList.length - 1]] //展示最后一次选择文件
-         this.itemObj.receptionImage = URL.createObjectURL(file.raw);
+         this.receptionImage = URL.createObjectURL(file.raw);
          if (this.fileList_2) {
            var formData = new FormData()
           //  formData.append('dotCode', this.dotCode)
             formData.append('file', this.fileList_2[0].raw)
-            this.apiUploadImg(formData)
+            this.apiUploadImg(formData,2)
           } else {
             this.$message({ message: '请上传图片!' })
           }
@@ -1167,12 +1249,13 @@ export default {
     handleChange3(file, fileList) {
       if(fileList.length>0){
          this.fileList_3 = [fileList[fileList.length - 1]] //展示最后一次选择文件
-         this.itemObj.constructionImage = URL.createObjectURL(file.raw);
+         this.constructionImage = URL.createObjectURL(file.raw);
+         console.log(this.itemObj.constructionImage);
           if (this.fileList_3) {
             var formData = new FormData()
             // formData.append('dotCode', this.dotCode)
             formData.append('file', this.fileList_3[0].raw)
-            this.apiUploadImg(formData)
+            this.apiUploadImg(formData,3)
           } else {
             this.$message({ message: '请上传图片!' })
           }
@@ -1181,12 +1264,12 @@ export default {
     handleChange4(file, fileList) {
       if(fileList.length>0){
          this.fileList_4 = [fileList[fileList.length - 1]] //展示最后一次选择文件
-         this.itemObj.trafficImage = URL.createObjectURL(file.raw);
+         this.trafficImage = URL.createObjectURL(file.raw);
           if (this.fileList_4) {
             var formData = new FormData()
             // formData.append('dotCode', this.dotCode)
             formData.append('file', this.fileList_4[0].raw)
-            this.apiUploadImg(formData)
+            this.apiUploadImg(formData,4)
           } else {
             this.$message({ message: '请上传图片!' })
           }
@@ -1195,12 +1278,12 @@ export default {
     handleChange5(file, fileList) {
       if(fileList.length>0){
          this.fileList_5 = [fileList[fileList.length - 1]] //展示最后一次选择文件
-         this.itemObj.honorImage = URL.createObjectURL(file.raw);
+         this.honorImage = URL.createObjectURL(file.raw);
          if (this.fileList_5) {
            var formData = new FormData()
           //  formData.append('dotCode', this.dotCode)
             formData.append('file', this.fileList_5[0].raw)
-            this.apiUploadImg(formData)
+            this.apiUploadImg(formData,5)
           } else {
             this.$message({ message: '请上传图片!' })
           }
@@ -1209,28 +1292,28 @@ export default {
     handleChange6(file, fileList) {
       if(fileList.length>0){
          this.fileList_6 = [fileList[fileList.length - 1]] //展示最后一次选择文件
-         this.itemObj.businessImage = URL.createObjectURL(file.raw);
+         this.businessImage = URL.createObjectURL(file.raw);
          if (this.fileList_6) {
            var formData = new FormData()
           //  formData.append('dotCode', this.dotCode)
             formData.append('file', this.fileList_6[0].raw)
-            this.apiUploadImg(formData)
+            this.apiUploadImg(formData,6)
           } else {
             this.$message({ message: '请上传图片!' })
           }
       }
     },
     beforeAvatarUpload(file) {
-        const isJPG = file.type === 'image/jpeg';
-        const isLt2M = file.size / 1024 / 1024 < 2;
+        const isJPG = file.type === 'image/jpeg'
+        const isLt5M = file.size / 1024 / 1024 < 5
 
         if (!isJPG) {
-          this.$message.error('上传图片只能是 JPG 格式!');
+          this.$message.error('上传图片只能是 JPG 格式!')
         }
-        if (!isLt2M) {
-          this.$message.error('上传图片大小不能超过 2MB!');
+        if (!isLt5M) {
+          this.$message.error('上传图片大小不能超过 5MB!')
         }
-        return isJPG && isLt2M;
+        return isJPG && isLt5M;
     },
   }
 }
@@ -1472,6 +1555,32 @@ export default {
       clear: both;
 }
 .boxUpload{   
+    .item{
+      position: relative;
+      // float: left;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-right: 4.5%;
+      margin-top: 3%;
+      margin-left: 3%;
+      .uploadTransparency{
+          display: block;
+          width: 150px;
+          height: 100px;
+          opacity: 0;
+          position: absolute;
+          top: 0;
+          left: 0;
+          z-index: 999;
+        }
+      .text{
+        margin-top: 10px;
+      }
+      .btn{
+        margin-top: 3px;
+      }
+    }
     .textUp{
       position: relative;
       float: left;
